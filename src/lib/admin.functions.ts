@@ -195,3 +195,64 @@ export const exportBackup = createServerFn({ method: "POST" })
     await log(context, "backup.export");
     return JSON.stringify({ exported_at: new Date().toISOString(), site_content: c.data, packages: p.data, gallery_photos: g.data }, null, 2);
   });
+
+function tempPassword() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(bytes, (b) => chars[b % chars.length]).join("");
+}
+
+export const listAdmins = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: roles, error } = await (supabaseAdmin as any).from("user_roles").select("user_id").eq("role", "admin");
+    fail(error, "Impossibile leggere gli amministratori");
+    const out: { id: string; email: string; self: boolean }[] = [];
+    for (const r of roles as { user_id: string }[]) {
+      const { data } = await supabaseAdmin.auth.admin.getUserById(r.user_id);
+      out.push({ id: r.user_id, email: data.user?.email ?? "(sconosciuto)", self: r.user_id === context.userId });
+    }
+    return out;
+  });
+
+export const addAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ email: z.string().trim().toLowerCase().email("Email non valida").max(200) }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: page, error: e1 } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+    fail(e1, "Impossibile verificare l'email");
+    let user = page.users.find((u) => u.email?.toLowerCase() === data.email);
+    let temp: string | null = null;
+    if (!user) {
+      temp = tempPassword();
+      const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+        email: data.email,
+        password: temp,
+        email_confirm: true,
+        user_metadata: { must_change_password: true },
+      });
+      fail(error, "Impossibile creare l'account");
+      user = created.user!;
+    }
+    const { error } = await (supabaseAdmin as any).from("user_roles").upsert({ user_id: user.id, role: "admin" }, { onConflict: "user_id,role", ignoreDuplicates: true });
+    fail(error, "Impossibile assegnare il ruolo");
+    await log(context, "admin.add", { email: data.email });
+    return { tempPassword: temp };
+  });
+
+export const removeAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    if (data.id === context.userId) throw new Error("Non puoi togliere l'accesso a te stesso");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await (supabaseAdmin as any).from("user_roles").delete().eq("user_id", data.id).eq("role", "admin");
+    fail(error, "Rimozione non riuscita");
+    await log(context, "admin.remove", { user_id: data.id });
+    return { ok: true };
+  });

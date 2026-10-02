@@ -35,7 +35,7 @@ function ResetPassword() {
     run(async () => {
       if (password.length < 8) throw new Error("La password deve avere almeno 8 caratteri.");
       if (password !== confirm) throw new Error("Le due password non coincidono.");
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await supabase.auth.updateUser({ password, data: { must_change_password: false } });
       if (error) throw new Error("Impossibile aggiornare la password: scegline una più sicura o richiedi un nuovo link.");
       setTimeout(() => navigate({ to: "/admin", replace: true }), 1200);
     }, "Password aggiornata");

@@ -75,6 +75,7 @@
   --primary-foreground: oklch(0.985 0.008 75);
   --secondary: oklch(0.69 0.19 52);
   --secondary-foreground: oklch(0.2 0.06 151);
+  --secondary-text: oklch(0.5 0.15 45);
   --muted: oklch(0.955 0.018 75);
   --muted-foreground: oklch(0.47 0.035 95);
   --accent: oklch(0.76 0.125 88);
@@ -185,7 +186,7 @@
 .three { display: grid; grid-template-columns: repeat(3,1fr); gap: 0; border-top: 1px solid var(--border); }
 .three article { padding: 2rem 2rem 0 0; }
 .three article + article { border-left: 1px solid var(--border); padding-left: 2rem; }
-.three b { color: var(--secondary); font-size: .75rem; }
+.three b { color: var(--secondary-text); font-size: .75rem; }
 .three h3 { font-size: 1.55rem; margin: .8rem 0; }
 .three p, .section-head > p, .card p, .detail p, .simple p { color: var(--muted-foreground); line-height: 1.7; }
 .listing { border-top: 1px solid var(--border); }
@@ -197,7 +198,7 @@
 .card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; transition: transform .5s; }
 .card:hover img { transform: scale(1.025); }
 .card-body { padding: 1.3rem 1.3rem 4.4rem; }
-.card-body span { color: var(--secondary); font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+.card-body span { color: var(--secondary-text); font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
 .card h3 { font-size: 1.7rem; margin: .55rem 0; }
 .card strong { font-size: .75rem; }
 .card-wa { position: absolute; left: 1.3rem; bottom: 1.2rem; padding-top: .8rem; border-top: 1px solid var(--border); width: calc(100% - 2.6rem); color: var(--primary); font-weight: 600; font-size: .78rem; }
@@ -218,7 +219,7 @@
 .detail h2 { font-size: 2.5rem; margin: 3rem 0 1rem; }
 .timeline { list-style: none; padding: 0; }
 .timeline li { display: grid; grid-template-columns: 3rem 1fr; gap: 1rem; padding: 1.4rem 0; border-top: 1px solid var(--border); }
-.timeline li > span { color: var(--secondary); font-weight: 600; }
+.timeline li > span { color: var(--secondary-text); font-weight: 600; }
 .timeline h3 { margin: 0; font-size: 1.35rem; }
 .timeline p { margin: .5rem 0 0; }
 .info { padding: 1.4rem 0; border-top: 1px solid var(--border); }
@@ -255,3 +256,6 @@ footer p { opacity: .72; line-height: 1.6; }
   .whatsapp-float { display: flex; }
 }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto!important; transition: none!important; } }
+
+/* Visible keyboard focus everywhere (accessibility). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible { outline: 3px solid var(--secondary-text); outline-offset: 2px; }

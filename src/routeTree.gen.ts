@@ -12,10 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LangRouteImport } from './routes/$lang'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangSectionRouteImport } from './routes/$lang.$section'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAccountRouteImport } from './routes/admin.account'
 import { Route as AdminGalleriaRouteImport } from './routes/admin.galleria'
 import { Route as AdminImpostazioniRouteImport } from './routes/admin.impostazioni'
 import { Route as AdminPacchettiRouteImport } from './routes/admin.pacchetti'
@@ -38,9 +42,24 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LangIndexRoute = LangIndexRouteImport.update({
@@ -56,6 +75,11 @@ const LangSectionRoute = LangSectionRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAccountRoute = AdminAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminGalleriaRoute = AdminGalleriaRouteImport.update({
@@ -93,8 +117,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/llms.txt': typeof LlmsDottxtRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$lang/$section': typeof LangSectionRouteWithChildren
+  '/admin/account': typeof AdminAccountRoute
   '/admin/galleria': typeof AdminGalleriaRoute
   '/admin/impostazioni': typeof AdminImpostazioniRoute
   '/admin/pacchetti': typeof AdminPacchettiRoute
@@ -106,7 +134,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/account': typeof AdminAccountRoute
   '/admin/galleria': typeof AdminGalleriaRoute
   '/admin/impostazioni': typeof AdminImpostazioniRoute
   '/admin/pacchetti': typeof AdminPacchettiRoute
@@ -121,8 +153,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/llms.txt': typeof LlmsDottxtRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$lang/$section': typeof LangSectionRouteWithChildren
+  '/admin/account': typeof AdminAccountRoute
   '/admin/galleria': typeof AdminGalleriaRoute
   '/admin/impostazioni': typeof AdminImpostazioniRoute
   '/admin/pacchetti': typeof AdminPacchettiRoute
@@ -138,8 +174,12 @@ export interface FileRouteTypes {
     | '/'
     | '/$lang'
     | '/admin'
+    | '/llms.txt'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/$lang/$section'
+    | '/admin/account'
     | '/admin/galleria'
     | '/admin/impostazioni'
     | '/admin/pacchetti'
@@ -151,7 +191,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/llms.txt'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/admin/account'
     | '/admin/galleria'
     | '/admin/impostazioni'
     | '/admin/pacchetti'
@@ -165,8 +209,12 @@ export interface FileRouteTypes {
     | '/'
     | '/$lang'
     | '/admin'
+    | '/llms.txt'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/$lang/$section'
+    | '/admin/account'
     | '/admin/galleria'
     | '/admin/impostazioni'
     | '/admin/pacchetti'
@@ -181,7 +229,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LangRoute: typeof LangRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicImgSplatRoute: typeof ApiPublicImgSplatRoute
 }
 
@@ -208,11 +259,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$lang/': {
@@ -234,6 +306,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/account': {
+      id: '/admin/account'
+      path: '/account'
+      fullPath: '/admin/account'
+      preLoaderRoute: typeof AdminAccountRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/galleria': {
@@ -308,6 +387,7 @@ const LangRouteChildren: LangRouteChildren = {
 const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 
 interface AdminRouteChildren {
+  AdminAccountRoute: typeof AdminAccountRoute
   AdminGalleriaRoute: typeof AdminGalleriaRoute
   AdminImpostazioniRoute: typeof AdminImpostazioniRoute
   AdminPacchettiRoute: typeof AdminPacchettiRoute
@@ -315,6 +395,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAccountRoute: AdminAccountRoute,
   AdminGalleriaRoute: AdminGalleriaRoute,
   AdminImpostazioniRoute: AdminImpostazioniRoute,
   AdminPacchettiRoute: AdminPacchettiRoute,
@@ -327,7 +408,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LangRoute: LangRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicImgSplatRoute: ApiPublicImgSplatRoute,
 }
 export const routeTree = rootRouteImport

@@ -45,26 +45,30 @@ function GalleryPage() {
     });
     let sort = photos.length;
     let done = 0;
+    let ok = 0;
     for (const f of valid) {
       setProgress(`Caricamento ${done + 1} di ${valid.length}…`);
       try {
         const { full, thumb } = await prepareImage(f);
-        const id = crypto.randomUUID();
+        // Content-hashed names: a file never changes under the same name, so it can be cached forever.
+        const hash = async (b: Blob) =>
+          Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", await b.arrayBuffer())).slice(0, 10), (x) => x.toString(16).padStart(2, "0")).join("");
         const folder = new Date().toISOString().slice(0, 7);
-        const path = `${folder}/${id}.webp`;
-        const thumbPath = `${folder}/${id}-thumb.webp`;
-        const a = await supabase.storage.from("gallery").upload(path, full.blob, { contentType: "image/webp" });
+        const path = `${folder}/${await hash(full.blob)}.webp`;
+        const thumbPath = `${folder}/${await hash(thumb.blob)}-480.webp`;
+        const a = await supabase.storage.from("gallery").upload(path, full.blob, { contentType: "image/webp", upsert: true });
         if (a.error) throw new Error(`Caricamento di “${f.name}” non riuscito.`);
-        const b = await supabase.storage.from("gallery").upload(thumbPath, thumb.blob, { contentType: "image/webp" });
+        const b = await supabase.storage.from("gallery").upload(thumbPath, thumb.blob, { contentType: "image/webp", upsert: true });
         if (b.error) throw new Error(`Caricamento di “${f.name}” non riuscito.`);
         const name = f.name.replace(/\.[^.]+$/, "").slice(0, 120);
         await register({ data: { path, thumb_path: thumbPath, width: full.width, height: full.height, caption: "", alt: name, category, sort: sort++ } });
+        ok++;
       } catch (e) {
         errs.push(errorText(e));
       }
       done++;
     }
-    setProgress(valid.length ? `${done - (errs.length - (files.length - valid.length))} foto caricate.` : "");
+    setProgress(valid.length ? `${ok} foto caricate.` : "");
     setErrors(errs);
     refresh();
   }
