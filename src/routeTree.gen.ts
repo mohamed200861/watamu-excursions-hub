@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LangRouteImport } from './routes/$lang'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangSectionRouteImport } from './routes/$lang.$section'
 import { Route as LangSectionIndexRouteImport } from './routes/$lang.$section.index'
@@ -25,6 +27,16 @@ const IndexRoute = IndexRouteImport.update({
 const LangRoute = LangRouteImport.update({
   id: '/$lang',
   path: '/$lang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LangIndexRoute = LangIndexRouteImport.update({
@@ -56,6 +68,8 @@ const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/admin': typeof AdminRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/$lang/$section': typeof LangSectionRouteWithChildren
   '/$lang/': typeof LangIndexRoute
   '/$lang/$section/$slug': typeof LangSectionSlugRoute
@@ -64,6 +78,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/$lang': typeof LangIndexRoute
   '/$lang/$section/$slug': typeof LangSectionSlugRoute
   '/$lang/$section': typeof LangSectionIndexRoute
@@ -73,6 +89,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/admin': typeof AdminRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/$lang/$section': typeof LangSectionRouteWithChildren
   '/$lang/': typeof LangIndexRoute
   '/$lang/$section/$slug': typeof LangSectionSlugRoute
@@ -84,6 +102,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$lang'
+    | '/admin'
+    | '/reset-password'
     | '/$lang/$section'
     | '/$lang/'
     | '/$lang/$section/$slug'
@@ -92,6 +112,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
+    | '/reset-password'
     | '/$lang'
     | '/$lang/$section/$slug'
     | '/$lang/$section'
@@ -100,6 +122,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$lang'
+    | '/admin'
+    | '/reset-password'
     | '/$lang/$section'
     | '/$lang/'
     | '/$lang/$section/$slug'
@@ -110,6 +134,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LangRoute: typeof LangRouteWithChildren
+  AdminRoute: typeof AdminRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicImgSplatRoute: typeof ApiPublicImgSplatRoute
 }
 
@@ -127,6 +153,20 @@ declare module '@tanstack/react-router' {
       path: '/$lang'
       fullPath: '/$lang'
       preLoaderRoute: typeof LangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$lang/': {
@@ -196,6 +236,8 @@ const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LangRoute: LangRouteWithChildren,
+  AdminRoute: AdminRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicImgSplatRoute: ApiPublicImgSplatRoute,
 }
 export const routeTree = rootRouteImport
