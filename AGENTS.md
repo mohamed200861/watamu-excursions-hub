@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Project architecture
+- Keep all bilingual public content in typed static modules and render it through locale-prefixed TanStack routes, because SSR/prerender and hreflang must stay deterministic without a CMS.

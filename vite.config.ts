@@ -11,5 +11,14 @@ export default defineConfig({
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    pages: [
+      { path: "/it" }, { path: "/en" },
+      ...["safari", "escursioni", "parchi", "chi-siamo", "galleria", "contatti"].map((path) => ({ path: `/it/${path}` })),
+      ...["safaris", "excursions", "parks", "about", "gallery", "contact"].map((path) => ({ path: `/en/${path}` })),
+      ...["tsavo-est-2-giorni", "tsavo-est-taita-hills-3-giorni", "tsavo-est-amboseli-3-giorni", "mara-nakuru-amboseli-5-giorni", "grande-kenya-6-giorni", "kenya-completo-7-giorni"].flatMap((slug) => [{ path: `/it/safari/${slug}` }, { path: `/en/safaris/${slug}` }]),
+      ...["safari-blu", "isola-dell-amore", "sardegna-due", "isola-di-robinson", "rovine-di-gede", "hells-kitchen-marafa", "vera-africa", "aperitivo-mida-creek"].flatMap((slug) => [{ path: `/it/escursioni/${slug}` }, { path: `/en/excursions/${slug}` }]),
+      ...["masai-mara", "amboseli", "lake-nakuru", "tsavo-est", "tsavo-ovest", "taita-hills"].flatMap((slug) => [{ path: `/it/parchi/${slug}` }, { path: `/en/parks/${slug}` }]),
+    ],
+    prerender: { enabled: true, autoStaticPathsDiscovery: false },
   },
 });
