@@ -15,6 +15,7 @@ import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangSectionRouteImport } from './routes/$lang.$section'
 import { Route as LangSectionIndexRouteImport } from './routes/$lang.$section.index'
 import { Route as LangSectionSlugRouteImport } from './routes/$lang.$section.$slug'
+import { Route as ApiPublicImgSplatRouteImport } from './routes/api/public/img.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const LangSectionSlugRoute = LangSectionSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => LangSectionRoute,
 } as any)
+const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
+  id: '/api/public/img/$',
+  path: '/api/public/img/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,12 +60,14 @@ export interface FileRoutesByFullPath {
   '/$lang/': typeof LangIndexRoute
   '/$lang/$section/$slug': typeof LangSectionSlugRoute
   '/$lang/$section/': typeof LangSectionIndexRoute
+  '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$lang': typeof LangIndexRoute
   '/$lang/$section/$slug': typeof LangSectionSlugRoute
   '/$lang/$section': typeof LangSectionIndexRoute
+  '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/$lang/': typeof LangIndexRoute
   '/$lang/$section/$slug': typeof LangSectionSlugRoute
   '/$lang/$section/': typeof LangSectionIndexRoute
+  '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -79,8 +88,14 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/$lang/$section/$slug'
     | '/$lang/$section/'
+    | '/api/public/img/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$lang' | '/$lang/$section/$slug' | '/$lang/$section'
+  to:
+    | '/'
+    | '/$lang'
+    | '/$lang/$section/$slug'
+    | '/$lang/$section'
+    | '/api/public/img/$'
   id:
     | '__root__'
     | '/'
@@ -89,11 +104,13 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/$lang/$section/$slug'
     | '/$lang/$section/'
+    | '/api/public/img/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LangRoute: typeof LangRouteWithChildren
+  ApiPublicImgSplatRoute: typeof ApiPublicImgSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -140,6 +157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangSectionSlugRouteImport
       parentRoute: typeof LangSectionRoute
     }
+    '/api/public/img/$': {
+      id: '/api/public/img/$'
+      path: '/api/public/img/$'
+      fullPath: '/api/public/img/$'
+      preLoaderRoute: typeof ApiPublicImgSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -172,6 +196,7 @@ const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LangRoute: LangRouteWithChildren,
+  ApiPublicImgSplatRoute: ApiPublicImgSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,7 +1,17 @@
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
-import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+
+// Attaches the admin's bearer token only on admin pages, loading the auth client lazily
+// so public pages never ship it (keeps the public bundle small).
+const attachAdminAuth = createMiddleware({ type: "function" }).client(async ({ next }) => {
+  const path = typeof window === "undefined" ? "" : window.location.pathname;
+  if (!path.startsWith("/admin") && !path.startsWith("/reset-password")) return next();
+  const { supabase } = await import("@/integrations/supabase/client");
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  return next({ headers: token ? { Authorization: `Bearer ${token}` } : {} });
+});
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -26,6 +36,6 @@ const csrfMiddleware = createCsrfMiddleware({
 });
 
 export const startInstance = createStart(() => ({
-  functionMiddleware: [attachSupabaseAuth],
+  functionMiddleware: [attachAdminAuth],
   requestMiddleware: [errorMiddleware, csrfMiddleware],
 }));
