@@ -5,20 +5,48 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { loadEnv, type Plugin } from "vite";
+import { writeFile } from "node:fs/promises";
+
+// On every build, refresh the fallback copy of the published content from the database.
+// If the database is unreachable the previous copy is kept.
+function contentSnapshot(): Plugin {
+  return {
+    name: "content-snapshot",
+    apply: "build",
+    async buildStart() {
+      const env = loadEnv("production", process.cwd(), "");
+      const url = env["VITE_SUPABASE_URL"];
+      const key = env["VITE_SUPABASE_PUBLISHABLE_KEY"];
+      if (!url || !key) return;
+      const headers: Record<string, string> = { apikey: key };
+      if (!key.startsWith("sb_")) headers["Authorization"] = `Bearer ${key}`;
+      try {
+        const get = async (p: string) => {
+          const r = await fetch(`${url}/rest/v1/${p}`, { headers, signal: AbortSignal.timeout(8000) });
+          if (!r.ok) throw new Error(String(r.status));
+          return r.json();
+        };
+        const [content, packages, photos] = await Promise.all([
+          get("site_content?select=key,data"),
+          get("packages?select=*&visible=eq.true&order=sort.asc"),
+          get("gallery_photos?select=*&order=sort.asc"),
+        ]);
+        const map = Object.fromEntries(content.map((r: { key: string; data: unknown }) => [r.key, r.data]));
+        if (!map["home"]) return;
+        await writeFile("src/lib/content-snapshot.json", JSON.stringify({ content: map, packages, photos }));
+      } catch (e) {
+        console.warn("[content-snapshot] kept previous copy:", e);
+      }
+    },
+  };
+}
 
 export default defineConfig({
+  plugins: [contentSnapshot()],
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
-    pages: [
-      { path: "/it" }, { path: "/en" },
-      ...["safari", "escursioni", "parchi", "chi-siamo", "galleria", "contatti"].map((path) => ({ path: `/it/${path}` })),
-      ...["safaris", "excursions", "parks", "about", "gallery", "contact"].map((path) => ({ path: `/en/${path}` })),
-      ...["tsavo-est-2-giorni", "tsavo-est-taita-hills-3-giorni", "tsavo-est-amboseli-3-giorni", "mara-nakuru-amboseli-5-giorni", "grande-kenya-6-giorni", "kenya-completo-7-giorni"].flatMap((slug) => [{ path: `/it/safari/${slug}` }, { path: `/en/safaris/${slug}` }]),
-      ...["safari-blu", "isola-dell-amore", "sardegna-due", "isola-di-robinson", "rovine-di-gede", "hells-kitchen-marafa", "vera-africa", "aperitivo-mida-creek"].flatMap((slug) => [{ path: `/it/escursioni/${slug}` }, { path: `/en/excursions/${slug}` }]),
-      ...["masai-mara", "amboseli", "lake-nakuru", "tsavo-est", "tsavo-ovest", "taita-hills"].flatMap((slug) => [{ path: `/it/parchi/${slug}` }, { path: `/en/parks/${slug}` }]),
-    ],
-    prerender: { enabled: true, autoStaticPathsDiscovery: false },
   },
 });

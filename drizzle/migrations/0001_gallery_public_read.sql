@@ -1,0 +1,1 @@
+CREATE POLICY "public read gallery files" ON storage.objects FOR SELECT TO anon, authenticated USING (bucket_id = 'gallery');

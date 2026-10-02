@@ -1,0 +1,176 @@
+import snapshot from "./content-snapshot.json";
+import en from "./content-en.json";
+import type { HomeText, ImageKey, Locale, PageText, Photo, Pkg, SiteContent } from "./content-types";
+
+type Row = {
+  kind: string;
+  slug: string;
+  title: string;
+  duration: string;
+  description: string;
+  itinerary: string[];
+  included: string[];
+  excluded: string[];
+  parks: string[];
+  lodges: string[];
+  image: string;
+  price: string | null;
+  sort: number;
+};
+type PhotoRow = {
+  id: string;
+  path: string;
+  thumb_path: string;
+  width: number;
+  height: number;
+  caption: string;
+  alt: string;
+  category: string;
+};
+export type Raw = { content: Record<string, any>; packages: Row[]; photos: PhotoRow[] };
+
+// Last content successfully read from the database in this worker.
+let lastGood: Raw | null = null;
+
+async function fetchRaw(): Promise<Raw> {
+  const url = process.env["SUPABASE_URL"];
+  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
+  if (!url || !key) throw new Error("Backend non configurato");
+  const headers: Record<string, string> = { apikey: key };
+  if (!key.startsWith("sb_")) headers["Authorization"] = `Bearer ${key}`;
+  const signal = AbortSignal.timeout(2500);
+  const get = async (path: string) => {
+    const r = await fetch(`${url}/rest/v1/${path}`, { headers, signal });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  };
+  const [content, packages, photos] = await Promise.all([
+    get("site_content?select=key,data"),
+    get("packages?select=*&visible=eq.true&order=sort.asc"),
+    get("gallery_photos?select=*&order=sort.asc"),
+  ]);
+  const map = Object.fromEntries((content as { key: string; data: unknown }[]).map((r) => [r.key, r.data]));
+  if (!map["home"]) throw new Error("Contenuti mancanti");
+  return { content: map, packages, photos };
+}
+
+export async function loadRaw(): Promise<Raw> {
+  try {
+    lastGood = await fetchRaw();
+    return lastGood;
+  } catch (error) {
+    console.error("Contenuti dal database non disponibili, uso copia di riserva", error);
+    return lastGood ?? (snapshot as unknown as Raw);
+  }
+}
+
+const images: ImageKey[] = ["safari", "coast", "wildlife", "creek"];
+const enPk = en.packages as Record<string, { title: string; duration: string; description: string; itinerary?: string[]; parks?: string[] }>;
+
+function toPkg(r: Row, lang: Locale): Pkg {
+  const base: Pkg = {
+    slug: r.slug,
+    title: r.title,
+    duration: r.duration,
+    description: r.description,
+    image: images.includes(r.image as ImageKey) ? (r.image as ImageKey) : "safari",
+    itinerary: r.itinerary ?? [],
+    included: r.included ?? [],
+    excluded: r.excluded ?? [],
+    parks: r.parks ?? [],
+    lodges: r.lodges ?? [],
+    price: r.price || null,
+  };
+  if (lang === "it") return base;
+  const t = enPk[r.slug];
+  if (!t) return base;
+  return {
+    ...base,
+    title: t.title,
+    duration: t.duration,
+    description: t.description,
+    itinerary: t.itinerary ?? base.itinerary,
+    parks: t.parks ?? base.parks,
+    included: r.kind === "safari" ? en.included : base.included,
+    excluded: r.kind === "safari" ? en.excluded : base.excluded,
+  };
+}
+
+const enHome: HomeText = {
+  heroEyebrow: "Watamu · Malindi · Kenya",
+  heroTitle: "Kenya, experienced up close.",
+  heroText: "Safaris and excursions guided by someone who truly knows this land.",
+  heroNote: "Local Italian-speaking guide",
+  introTitle: "Not just another tour. Your encounter with Kenya.",
+  why: [
+    { title: "Local knowledge", text: "Journeys shaped by first-hand knowledge of parks and coast." },
+    { title: "In Italian", text: "A licensed Italian-speaking guide to experience and understand every moment." },
+    { title: "Safety", text: "Professional drivers, 4x4 vehicles and full safari insurance." },
+  ],
+  featuredTitle: "Featured safaris",
+  featuredIntro: "From Tsavo's red earth to the plains of Masai Mara.",
+  seaEyebrow: "Sea and land",
+  seaTitle: "Beyond the savanna",
+  seaText: "Atolls, mangroves, ruins and sunsets: discover the soul of the Kenyan coast.",
+  footerText: "Safaris and excursions in Kenya, based in Watamu and Malindi.",
+};
+const enPages: Record<"about" | "contact" | "gallery", PageText> = {
+  about: {
+    title: "About us",
+    subtitle: "Discover Kenya with someone who lives it.",
+    text: "Africano di Africa guides Italian travellers through Kenya’s great parks and the Watamu and Malindi coast, with local experience, respect and care for safety.",
+  },
+  contact: {
+    title: "Contact",
+    subtitle: "Your journey begins with a conversation.",
+    text: "Message Africano directly on WhatsApp for information about safaris and excursions.",
+  },
+  gallery: {
+    title: "Gallery",
+    subtitle: "Red earth, ocean and mangroves.",
+    text: "A glimpse of the landscapes that make every Kenyan journey unique.",
+  },
+};
+const enFaq = [
+  { q: "What time do safaris depart?", a: "Departures are at 6:00. Each day includes morning and afternoon game drives, with lunch and overnight at a lodge or camp." },
+  { q: "What does the safari include?", a: en.included.join(", ") + "." },
+  { q: "What is not included?", a: en.excluded.join(", ") + "." },
+  { q: "What should I bring?", a: en.bring.join(", ") + "." },
+  { q: "Are lodges guaranteed?", a: "The listed properties are assigned subject to availability." },
+  { q: "What can I do at night in Taita Hills?", a: "An optional paid night safari with a ranger is available." },
+];
+const enTemplate = "Hello Africano! I would like information about {pacchetto}. People: {persone}. Dates: {date}.";
+
+export function buildContent(raw: Raw, lang: Locale): SiteContent {
+  const c = raw.content;
+  const settings = (c["settings"] ?? {}) as { whatsapp?: string; template?: string };
+  const whatsapp = (settings.whatsapp || "254742161072").replace(/\D/g, "");
+  const rows = [...raw.packages].sort((a, b) => a.sort - b.sort);
+  const pk = (kind: string) => rows.filter((r) => r.kind === kind).map((r) => toPkg(r, lang));
+  const photos: Photo[] = raw.photos.map((p) => ({
+    id: p.id,
+    src: `/api/public/img/${p.path}`,
+    thumb: `/api/public/img/${p.thumb_path}`,
+    width: p.width,
+    height: p.height,
+    caption: p.caption,
+    alt: p.alt || p.caption,
+    category: p.category,
+  }));
+  const it = lang === "it";
+  return {
+    lang,
+    whatsapp,
+    template: it ? settings.template || "Ciao Africano! Vorrei informazioni su {pacchetto}." : enTemplate,
+    home: it ? (c["home"] as HomeText) : enHome,
+    about: it ? (c["about"] as PageText) : enPages.about,
+    contact: it ? (c["contact"] as PageText) : enPages.contact,
+    gallery: it ? (c["gallery"] as PageText) : enPages.gallery,
+    faq: it ? ((c["faq"]?.items ?? []) as { q: string; a: string }[]) : enFaq,
+    bring: it ? ((c["info"]?.bring ?? []) as string[]) : en.bring,
+    safari: pk("safari"),
+    excursions: pk("excursion"),
+    parks: pk("park"),
+    photos,
+  };
+}
