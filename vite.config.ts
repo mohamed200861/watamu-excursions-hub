@@ -33,7 +33,7 @@ function contentSnapshot(): Plugin {
           get("gallery_photos?select=*&order=sort.asc"),
         ]);
         const map = Object.fromEntries(content.map((r: { key: string; data: unknown }) => [r.key, r.data]));
-        if (!map.home) return;
+        if (!map["home"]) return;
         await writeFile("src/lib/content-snapshot.json", JSON.stringify({ content: map, packages, photos }));
       } catch (e) {
         console.warn("[content-snapshot] kept previous copy:", e);

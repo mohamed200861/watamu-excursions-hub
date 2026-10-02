@@ -8,7 +8,8 @@ import { Area, Card, Lines, Text, btn, btnDanger, btnGhost, move, useStatus } fr
 
 export const Route = createFileRoute("/admin/")({ component: TextsPage });
 
-type Any = Record<string, any>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Any = any;
 
 function useSiteContent() {
   return useQuery({

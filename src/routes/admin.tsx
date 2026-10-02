@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin")({
   errorComponent: ({ error }) => (
     <div className="mx-auto max-w-lg p-6">
       <Card title="Qualcosa non ha funzionato">
-        <p className="text-sm text-muted-foreground">{error.message}</p>
+        <p className="text-sm text-muted-foreground">{(error as Error).message}</p>
         <a className={btn} href="/admin">Ricarica</a>
       </Card>
     </div>

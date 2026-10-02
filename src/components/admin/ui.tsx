@@ -9,7 +9,7 @@ export const btnGhost =
 export const btnDanger =
   "inline-flex min-h-11 items-center justify-center rounded-md border border-destructive px-4 py-2 text-sm font-medium text-destructive disabled:opacity-50";
 
-export function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
+export function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string | undefined }) {
   return (
     <label className="block space-y-1">
       <span className="text-sm font-semibold text-foreground">{label}</span>
@@ -19,7 +19,7 @@ export function Field({ label, children, hint }: { label: string; children: Reac
   );
 }
 
-export function Text({ label, value, onChange, hint }: { label: string; value: string; onChange: (v: string) => void; hint?: string }) {
+export function Text({ label, value, onChange, hint }: { label: string; value: string; onChange: (v: string) => void; hint?: string | undefined }) {
   return (
     <Field label={label} hint={hint}>
       <input className={input} value={value} onChange={(e) => onChange(e.target.value)} />
@@ -27,7 +27,7 @@ export function Text({ label, value, onChange, hint }: { label: string; value: s
   );
 }
 
-export function Area({ label, value, onChange, rows = 3, hint }: { label: string; value: string; onChange: (v: string) => void; rows?: number; hint?: string }) {
+export function Area({ label, value, onChange, rows = 3, hint }: { label: string; value: string; onChange: (v: string) => void; rows?: number; hint?: string | undefined }) {
   return (
     <Field label={label} hint={hint}>
       <textarea className={input} rows={rows} value={value} onChange={(e) => onChange(e.target.value)} />
@@ -36,7 +36,7 @@ export function Area({ label, value, onChange, rows = 3, hint }: { label: string
 }
 
 /** Edits a list of strings as one item per line. */
-export function Lines({ label, value, onChange, rows = 4, hint }: { label: string; value: string[]; onChange: (v: string[]) => void; rows?: number; hint?: string }) {
+export function Lines({ label, value, onChange, rows = 4, hint }: { label: string; value: string[]; onChange: (v: string[]) => void; rows?: number; hint?: string | undefined }) {
   return (
     <Area
       label={label}

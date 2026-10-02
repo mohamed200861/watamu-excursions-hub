@@ -52,9 +52,9 @@ type ContentKey = keyof typeof contentSchemas;
 export const claimAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.rpc("claim_admin");
+    const { data, error } = await (context.supabase as any).rpc("claim_admin");
     fail(error, "Impossibile verificare l'account");
-    if (data) await context.supabase.from("audit_log").insert({ user_id: context.userId, action: "admin.claim", detail: {} });
+    if (data) await (context.supabase as any).from("audit_log").insert({ user_id: context.userId, action: "admin.claim", detail: {} });
     return { ok: !!data };
   });
 
@@ -66,7 +66,7 @@ export const saveContent = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { error } = await context.supabase.from("site_content").upsert({ key: data.key, data: data.data, updated_at: new Date().toISOString() });
+    const { error } = await (context.supabase as any).from("site_content").upsert({ key: data.key, data: data.data, updated_at: new Date().toISOString() });
     fail(error, "Salvataggio non riuscito");
     await log(context, "content.save", { key: data.key });
     return { ok: true };
@@ -97,8 +97,8 @@ export const savePackage = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const row = { ...data, price: data.price || null, updated_at: new Date().toISOString() };
     const { data: saved, error } = data.id
-      ? await context.supabase.from("packages").update(row).eq("id", data.id).select("id").single()
-      : await context.supabase.from("packages").insert(row).select("id").single();
+      ? await (context.supabase as any).from("packages").update(row).eq("id", data.id).select("id").single()
+      : await (context.supabase as any).from("packages").insert(row).select("id").single();
     if (error?.code === "23505") throw new Error("Esiste già un pacchetto con questo indirizzo");
     fail(error, "Salvataggio non riuscito");
     await log(context, data.id ? "package.update" : "package.create", { slug: data.slug });
@@ -110,8 +110,8 @@ export const deletePackage = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { data: row } = await context.supabase.from("packages").select("slug").eq("id", data.id).single();
-    const { error } = await context.supabase.from("packages").delete().eq("id", data.id);
+    const { data: row } = await (context.supabase as any).from("packages").select("slug").eq("id", data.id).single();
+    const { error } = await (context.supabase as any).from("packages").delete().eq("id", data.id);
     fail(error, "Eliminazione non riuscita");
     await log(context, "package.delete", { slug: row?.slug });
     return { ok: true };
@@ -124,7 +124,7 @@ export const reorder = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     for (const [i, id] of data.ids.entries()) {
-      const { error } = await context.supabase.from(data.table).update({ sort: i }).eq("id", id);
+      const { error } = await (context.supabase as any).from(data.table).update({ sort: i }).eq("id", id);
       fail(error, "Riordino non riuscito");
     }
     return { ok: true };
@@ -149,7 +149,7 @@ export const registerPhoto = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { error } = await context.supabase.from("gallery_photos").insert(data);
+    const { error } = await (context.supabase as any).from("gallery_photos").insert(data);
     fail(error, "Registrazione foto non riuscita");
     await log(context, "photo.upload", { path: data.path });
     return { ok: true };
@@ -163,7 +163,7 @@ export const updatePhoto = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { id, ...rest } = data;
-    const { error } = await context.supabase.from("gallery_photos").update(rest).eq("id", id);
+    const { error } = await (context.supabase as any).from("gallery_photos").update(rest).eq("id", id);
     fail(error, "Salvataggio non riuscito");
     return { ok: true };
   });
@@ -173,10 +173,10 @@ export const deletePhoto = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { data: row, error: e1 } = await context.supabase.from("gallery_photos").select("path, thumb_path").eq("id", data.id).single();
+    const { data: row, error: e1 } = await (context.supabase as any).from("gallery_photos").select("path, thumb_path").eq("id", data.id).single();
     fail(e1, "Foto non trovata");
-    await context.supabase.storage.from("gallery").remove([row.path, row.thumb_path]);
-    const { error } = await context.supabase.from("gallery_photos").delete().eq("id", data.id);
+    await (context.supabase as any).storage.from("gallery").remove([row.path, row.thumb_path]);
+    const { error } = await (context.supabase as any).from("gallery_photos").delete().eq("id", data.id);
     fail(error, "Eliminazione non riuscita");
     await log(context, "photo.delete", { path: row.path });
     return { ok: true };
@@ -187,9 +187,9 @@ export const exportBackup = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     await assertAdmin(context);
     const [c, p, g] = await Promise.all([
-      context.supabase.from("site_content").select("*"),
-      context.supabase.from("packages").select("*").order("sort"),
-      context.supabase.from("gallery_photos").select("*").order("sort"),
+      (context.supabase as any).from("site_content").select("*"),
+      (context.supabase as any).from("packages").select("*").order("sort"),
+      (context.supabase as any).from("gallery_photos").select("*").order("sort"),
     ]);
     fail(c.error || p.error || g.error, "Backup non riuscito");
     await log(context, "backup.export");
