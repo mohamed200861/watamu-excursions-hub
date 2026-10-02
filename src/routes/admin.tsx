@@ -6,6 +6,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { claimAdmin } from "@/lib/admin.functions";
 import { Card, Field, btn, btnGhost, input, useStatus } from "@/components/admin/ui";
+import { PasswordForm } from "@/components/admin/PasswordForm";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -48,7 +49,22 @@ function AdminLayout() {
   if (!session) return <Login />;
   if (isAdmin === null) return <Center>Verifica account…</Center>;
   if (!isAdmin) return <NotAdmin onClaimed={() => setIsAdmin(true)} />;
+  if (session.user.user_metadata?.["must_change_password"]) return <ForceChange />;
   return <Shell email={session.user.email ?? ""} />;
+}
+
+function ForceChange() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="w-full max-w-sm">
+        <Card title="Scegli la tua password">
+          <p className="text-sm text-muted-foreground">Stai usando una password temporanea. Per continuare scegline una nuova e personale.</p>
+          <PasswordForm onDone={() => supabase.auth.refreshSession()} />
+          <button className={`${btnGhost} w-full`} onClick={() => supabase.auth.signOut()}>Esci</button>
+        </Card>
+      </div>
+    </div>
+  );
 }
 
 function Center({ children }: { children: React.ReactNode }) {
@@ -69,6 +85,7 @@ function Shell({ email }: { email: string }) {
     { to: "/admin/pacchetti", label: "Pacchetti" },
     { to: "/admin/galleria", label: "Galleria" },
     { to: "/admin/impostazioni", label: "WhatsApp e backup" },
+    { to: "/admin/account", label: "Account" },
   ] as const;
   return (
     <div className="min-h-screen bg-background text-foreground">
