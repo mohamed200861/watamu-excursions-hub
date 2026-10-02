@@ -16,6 +16,8 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangSectionRouteImport } from './routes/$lang.$section'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminGalleriaRouteImport } from './routes/admin.galleria'
+import { Route as AdminImpostazioniRouteImport } from './routes/admin.impostazioni'
 import { Route as AdminPacchettiRouteImport } from './routes/admin.pacchetti'
 import { Route as LangSectionIndexRouteImport } from './routes/$lang.$section.index'
 import { Route as LangSectionSlugRouteImport } from './routes/$lang.$section.$slug'
@@ -56,6 +58,16 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGalleriaRoute = AdminGalleriaRouteImport.update({
+  id: '/galleria',
+  path: '/galleria',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminImpostazioniRoute = AdminImpostazioniRouteImport.update({
+  id: '/impostazioni',
+  path: '/impostazioni',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPacchettiRoute = AdminPacchettiRouteImport.update({
   id: '/pacchetti',
   path: '/pacchetti',
@@ -83,6 +95,8 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/$section': typeof LangSectionRouteWithChildren
+  '/admin/galleria': typeof AdminGalleriaRoute
+  '/admin/impostazioni': typeof AdminImpostazioniRoute
   '/admin/pacchetti': typeof AdminPacchettiRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -93,6 +107,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin/galleria': typeof AdminGalleriaRoute
+  '/admin/impostazioni': typeof AdminImpostazioniRoute
   '/admin/pacchetti': typeof AdminPacchettiRoute
   '/$lang': typeof LangIndexRoute
   '/admin': typeof AdminIndexRoute
@@ -107,6 +123,8 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/$lang/$section': typeof LangSectionRouteWithChildren
+  '/admin/galleria': typeof AdminGalleriaRoute
+  '/admin/impostazioni': typeof AdminImpostazioniRoute
   '/admin/pacchetti': typeof AdminPacchettiRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/': typeof AdminIndexRoute
@@ -122,6 +140,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/$lang/$section'
+    | '/admin/galleria'
+    | '/admin/impostazioni'
     | '/admin/pacchetti'
     | '/$lang/'
     | '/admin/'
@@ -132,6 +152,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/reset-password'
+    | '/admin/galleria'
+    | '/admin/impostazioni'
     | '/admin/pacchetti'
     | '/$lang'
     | '/admin'
@@ -145,6 +167,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/$lang/$section'
+    | '/admin/galleria'
+    | '/admin/impostazioni'
     | '/admin/pacchetti'
     | '/$lang/'
     | '/admin/'
@@ -212,6 +236,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/galleria': {
+      id: '/admin/galleria'
+      path: '/galleria'
+      fullPath: '/admin/galleria'
+      preLoaderRoute: typeof AdminGalleriaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/impostazioni': {
+      id: '/admin/impostazioni'
+      path: '/impostazioni'
+      fullPath: '/admin/impostazioni'
+      preLoaderRoute: typeof AdminImpostazioniRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/pacchetti': {
       id: '/admin/pacchetti'
       path: '/pacchetti'
@@ -270,11 +308,15 @@ const LangRouteChildren: LangRouteChildren = {
 const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 
 interface AdminRouteChildren {
+  AdminGalleriaRoute: typeof AdminGalleriaRoute
+  AdminImpostazioniRoute: typeof AdminImpostazioniRoute
   AdminPacchettiRoute: typeof AdminPacchettiRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminGalleriaRoute: AdminGalleriaRoute,
+  AdminImpostazioniRoute: AdminImpostazioniRoute,
   AdminPacchettiRoute: AdminPacchettiRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
