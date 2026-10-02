@@ -162,6 +162,10 @@
 .site-header nav { display: flex; gap: 1.6rem; align-items: center; font-size: .8rem; font-weight: 600; }
 .site-header nav a:hover, .footer-links a:hover { color: var(--secondary); }
 .header-actions { display: flex; gap: .8rem; align-items: center; }
+.mobile-menu { display: none; position: relative; }
+.mobile-menu summary { cursor: pointer; list-style: none; font-size: 1.35rem; }
+.mobile-menu div { position: absolute; right: 0; top: 2.4rem; min-width: 13rem; display: grid; padding: .75rem; background: var(--background); border: 1px solid var(--border); box-shadow: 0 12px 30px color-mix(in oklab,var(--primary) 12%,transparent); }
+.mobile-menu a { padding: .7rem; font-size: .85rem; }
 .lang { font-size: .72rem; border-bottom: 1px solid currentColor; }
 .button { display: inline-flex; min-height: 2.9rem; align-items: center; justify-content: center; padding: .75rem 1.2rem; background: var(--secondary); color: var(--secondary-foreground); font-weight: 600; font-size: .82rem; border-radius: var(--radius); transition: transform .2s, background .2s; }
 .button:hover { transform: translateY(-2px); background: var(--accent); }
@@ -235,6 +239,7 @@ footer p { opacity: .72; line-height: 1.6; }
 @media (max-width: 860px) {
   .site-header { height: 4.5rem; }
   .site-header nav { display: none; }
+  .mobile-menu { display: block; }
   .brand img { width: 3.2rem; height: 3.2rem; }
   .button.small { display: none; }
   .hero { min-height: calc(88svh - 4.5rem); }
