@@ -93,3 +93,11 @@ export function errorText(e: unknown): string {
   }
   return msg || "Si è verificato un errore";
 }
+
+export function move<T>(arr: T[], i: number, d: number): T[] {
+  const next = [...arr];
+  const j = i + d;
+  if (j < 0 || j >= next.length) return next;
+  [next[i], next[j]] = [next[j] as T, next[i] as T];
+  return next;
+}

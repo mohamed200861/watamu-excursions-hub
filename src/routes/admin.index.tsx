@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { saveContent } from "@/lib/admin.functions";
-import { Area, Card, Lines, Text, btn, btnDanger, btnGhost, useStatus } from "@/components/admin/ui";
+import { Area, Card, Lines, Text, btn, btnDanger, btnGhost, move, useStatus } from "@/components/admin/ui";
 
 export const Route = createFileRoute("/admin/")({ component: TextsPage });
 
@@ -124,10 +124,3 @@ function FaqForm({ v, set }: { v: Any; set: (v: Any) => void }) {
   );
 }
 
-export function move<T>(arr: T[], i: number, d: number): T[] {
-  const next = [...arr];
-  const j = i + d;
-  if (j < 0 || j >= next.length) return next;
-  [next[i], next[j]] = [next[j] as T, next[i] as T];
-  return next;
-}

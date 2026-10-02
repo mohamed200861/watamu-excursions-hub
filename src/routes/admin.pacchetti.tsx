@@ -4,8 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { deletePackage, reorder, savePackage } from "@/lib/admin.functions";
-import { Area, Card, Field, Lines, Text, btn, btnDanger, btnGhost, input, useStatus } from "@/components/admin/ui";
-import { move } from "./admin.index";
+import { Area, Card, Field, Lines, Text, btn, btnDanger, btnGhost, input, move, useStatus } from "@/components/admin/ui";
 
 export const Route = createFileRoute("/admin/pacchetti")({ component: PackagesPage });
 
