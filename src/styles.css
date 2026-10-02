@@ -256,3 +256,6 @@ footer p { opacity: .72; line-height: 1.6; }
   .whatsapp-float { display: flex; }
 }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto!important; transition: none!important; } }
+
+/* Visible keyboard focus everywhere (accessibility). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible { outline: 3px solid var(--secondary-text); outline-offset: 2px; }
