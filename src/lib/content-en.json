@@ -1,0 +1,193 @@
+{
+ "packages": {
+  "tsavo-est-2-giorni": {
+   "title": "Tsavo East",
+   "duration": "2 days / 1 night",
+   "description": "An intense first encounter with Tsavo East’s red earth and wildlife.",
+   "itinerary": [
+    "Depart Watamu or Malindi at 6:00, enter Tsavo East and enjoy a morning game drive. Lunch, afternoon safari and overnight at the lodge.",
+    "Dawn game drive, breakfast and a final safari. Lunch and return to Watamu or transfer to Mombasa airport."
+   ],
+   "parks": [
+    "Tsavo Est National Park"
+   ]
+  },
+  "tsavo-est-taita-hills-3-giorni": {
+   "title": "Tsavo East + Taita Hills",
+   "duration": "3 days / 2 nights",
+   "description": "From Tsavo’s red earth to the intimate landscapes of Taita Hills.",
+   "itinerary": [
+    "Depart at 6:00, enter Tsavo East, game drive, lunch and afternoon safari. Overnight at the lodge.",
+    "Morning game drive, breakfast and transfer to Taita Hills. Lunch, afternoon game drive and overnight. Optional paid night safari with a ranger.",
+    "Morning game drive, breakfast, lunch and return to Watamu or transfer to Mombasa airport."
+   ],
+   "parks": [
+    "Tsavo Est National Park",
+    "Taita Hills Wildlife Sanctuary"
+   ]
+  },
+  "tsavo-est-amboseli-3-giorni": {
+   "title": "Tsavo East + Amboseli",
+   "duration": "3 days / 2 nights",
+   "description": "Elephants, open plains and two of Kenya’s most iconic parks.",
+   "itinerary": [
+    "Depart at 6:00, enter Tsavo East, game drive, lunch and afternoon safari. Overnight at the lodge.",
+    "Morning game drive and transfer to Amboseli. Lunch, afternoon safari and overnight at camp.",
+    "Morning game drive, breakfast and lunch. Return to Watamu or transfer to Mombasa airport."
+   ],
+   "parks": [
+    "Tsavo Est National Park",
+    "Amboseli National Park"
+   ]
+  },
+  "mara-nakuru-amboseli-5-giorni": {
+   "title": "Masai Mara, Nakuru & Amboseli",
+   "duration": "5 days / 4 nights from Nairobi",
+   "description": "A complete journey from Nairobi through savanna, lake and Kilimanjaro country.",
+   "itinerary": [
+    "Depart Nairobi at 6:00 for Masai Mara. Lunch, afternoon game drive and overnight.",
+    "Morning and afternoon game drives in Masai Mara, lunch and a second night at lodge or camp.",
+    "Depart after the morning game drive for Lake Nakuru. Lunch, afternoon safari and overnight.",
+    "Morning game drive and transfer to Amboseli. Lunch, afternoon safari and overnight.",
+    "Final game drive and breakfast, then return or transfer to Mombasa airport."
+   ],
+   "parks": [
+    "Masai Mara National Reserve",
+    "Lake Nakuru National Park",
+    "Amboseli National Park"
+   ]
+  },
+  "grande-kenya-6-giorni": {
+   "title": "Masai Mara, Nakuru, Amboseli & Tsavo East",
+   "duration": "6 days / 5 nights",
+   "description": "A grand journey through four Kenyan ecosystems.",
+   "itinerary": [
+    "Depart at 6:00 for Masai Mara, lunch, afternoon game drive and overnight.",
+    "Morning and afternoon game drives in Masai Mara, lunch and a second night.",
+    "Transfer to Lake Nakuru, lunch, afternoon game drive and overnight.",
+    "Morning game drive and transfer to Amboseli. Lunch, afternoon safari and overnight.",
+    "Morning game drive and transfer to Tsavo East. Lunch, afternoon safari and overnight.",
+    "Morning game drive, breakfast and lunch. Return to Watamu or Mombasa airport."
+   ],
+   "parks": [
+    "Masai Mara National Reserve",
+    "Lake Nakuru National Park",
+    "Amboseli National Park",
+    "Tsavo Est National Park"
+   ]
+  },
+  "kenya-completo-7-giorni": {
+   "title": "The complete Kenya journey",
+   "duration": "7 days / 6 nights",
+   "description": "From the Mara’s big cats to Tsavo’s red earth, via Taita Hills.",
+   "itinerary": [
+    "Depart at 6:00 for Masai Mara, lunch, afternoon game drive and overnight.",
+    "Morning and afternoon game drives in Masai Mara, lunch and a second night.",
+    "Transfer to Lake Nakuru, lunch, afternoon safari and overnight.",
+    "Morning game drive and transfer to Amboseli. Lunch, afternoon safari and overnight.",
+    "Transfer to Taita Hills, lunch and afternoon game drive. Optional paid night safari with a ranger.",
+    "Morning game drive and transfer to Tsavo East. Lunch, afternoon safari and overnight.",
+    "Final game drive, breakfast and lunch. Return to Watamu or Mombasa airport."
+   ],
+   "parks": [
+    "Masai Mara National Reserve",
+    "Lake Nakuru National Park",
+    "Amboseli National Park",
+    "Taita Hills Wildlife Sanctuary",
+    "Tsavo Est National Park"
+   ]
+  },
+  "safari-blu": {
+   "title": "Blue Safari",
+   "duration": "Sea, reef and flavours",
+   "description": "Snorkelling in Watamu Marine National Park, Garoda beach, lobster lunch on Sudi Island and return at 17:00."
+  },
+  "isola-dell-amore": {
+   "title": "Love Island",
+   "duration": "A heart of white sand",
+   "description": "Reach the atoll on foot or by boat depending on the tide: a natural heart of white sand."
+  },
+  "sardegna-due": {
+   "title": "Sardegna Due",
+   "duration": "Atoll and coral reef",
+   "description": "A day between the atoll and coral reef, with a shellfish lunch."
+  },
+  "isola-di-robinson": {
+   "title": "Robinson Island",
+   "duration": "Mangroves and nature",
+   "description": "An excursion to Che Shale, among red crabs, mangroves and coastal landscapes."
+  },
+  "rovine-di-gede": {
+   "title": "Gede Ruins",
+   "duration": "History in the forest",
+   "description": "Forest-covered ruins among great baobabs and the curious local monkeys."
+  },
+  "hells-kitchen-marafa": {
+   "title": "Hell’s Kitchen",
+   "duration": "Marafa canyon",
+   "description": "Earth-sculpted forms and an unforgettable sunset in Marafa’s Hell’s Kitchen."
+  },
+  "vera-africa": {
+   "title": "Real Africa",
+   "duration": "Respectful encounters",
+   "description": "Swahili villages and time with local families. Guests may bring gifts, always respectfully and without rhetoric."
+  },
+  "aperitivo-mida-creek": {
+   "title": "Sunset at Mida Creek",
+   "duration": "Sunset among mangroves",
+   "description": "Sunset drinks among the mangroves at Lichthaus, Crab Shack or Prawn’s Lake."
+  },
+  "masai-mara": {
+   "title": "Masai Mara National Reserve",
+   "duration": "The great savanna",
+   "description": "Vast plains, iconic wildlife and game drives at the heart of the reserve."
+  },
+  "amboseli": {
+   "title": "Amboseli National Park",
+   "duration": "Below Kilimanjaro",
+   "description": "Open plains, elephant herds and views of Kilimanjaro."
+  },
+  "lake-nakuru": {
+   "title": "Lake Nakuru National Park",
+   "duration": "Lake and Rift Valley",
+   "description": "A Rift Valley lake ecosystem rich in birdlife and terrestrial wildlife."
+  },
+  "tsavo-est": {
+   "title": "Tsavo East National Park",
+   "duration": "The red earth",
+   "description": "Known for red earth, elephants and immense horizons."
+  },
+  "tsavo-ovest": {
+   "title": "Tsavo West National Park",
+   "duration": "Wild landscapes",
+   "description": "Hills, springs and volcanic landscapes in western Tsavo."
+  },
+  "taita-hills": {
+   "title": "Taita Hills Wildlife Sanctuary",
+   "duration": "An intimate sanctuary",
+   "description": "An intimate hilly sanctuary with wildlife and optional ranger-led night drives."
+  }
+ },
+ "included": [
+  "Open-roof 4x4 jeep",
+  "Park entrance fees",
+  "All-inclusive accommodation (drinks at meals excluded)",
+  "Water during game drives",
+  "Licensed Italian-speaking guide",
+  "Professional driver",
+  "Full safari insurance"
+ ],
+ "excluded": [
+  "Drinks at meals and breakfast on departure day",
+  "Tips",
+  "Personal extras",
+  "Masai village entrance"
+ ],
+ "bring": [
+  "Summer clothing and warmer layers for evenings",
+  "Hat, mosquito repellent and sunscreen",
+  "Sunglasses and swimwear",
+  "Travel adaptor",
+  "Binoculars and camera"
+ ]
+}
