@@ -45,6 +45,7 @@ function GalleryPage() {
     });
     let sort = photos.length;
     let done = 0;
+    let ok = 0;
     for (const f of valid) {
       setProgress(`Caricamento ${done + 1} di ${valid.length}…`);
       try {
@@ -61,12 +62,13 @@ function GalleryPage() {
         if (b.error) throw new Error(`Caricamento di “${f.name}” non riuscito.`);
         const name = f.name.replace(/\.[^.]+$/, "").slice(0, 120);
         await register({ data: { path, thumb_path: thumbPath, width: full.width, height: full.height, caption: "", alt: name, category, sort: sort++ } });
+        ok++;
       } catch (e) {
         errs.push(errorText(e));
       }
       done++;
     }
-    setProgress(valid.length ? `${done - (errs.length - (files.length - valid.length))} foto caricate.` : "");
+    setProgress(valid.length ? `${ok} foto caricate.` : "");
     setErrors(errs);
     refresh();
   }
