@@ -55,9 +55,9 @@ function GalleryPage() {
         const folder = new Date().toISOString().slice(0, 7);
         const path = `${folder}/${await hash(full.blob)}.webp`;
         const thumbPath = `${folder}/${await hash(thumb.blob)}-480.webp`;
-        const a = await supabase.storage.from("gallery").upload(path, full.blob, { contentType: "image/webp" });
+        const a = await supabase.storage.from("gallery").upload(path, full.blob, { contentType: "image/webp", upsert: true });
         if (a.error) throw new Error(`Caricamento di “${f.name}” non riuscito.`);
-        const b = await supabase.storage.from("gallery").upload(thumbPath, thumb.blob, { contentType: "image/webp" });
+        const b = await supabase.storage.from("gallery").upload(thumbPath, thumb.blob, { contentType: "image/webp", upsert: true });
         if (b.error) throw new Error(`Caricamento di “${f.name}” non riuscito.`);
         const name = f.name.replace(/\.[^.]+$/, "").slice(0, 120);
         await register({ data: { path, thumb_path: thumbPath, width: full.width, height: full.height, caption: "", alt: name, category, sort: sort++ } });
