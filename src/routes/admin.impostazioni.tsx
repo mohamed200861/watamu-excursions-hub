@@ -107,11 +107,11 @@ function SettingsPage() {
 }
 
 function OwnerEditor() {
-  const empty: Owner = { name: "", address: "", email: "", phone: "", license: "" };
+  const empty: Owner = { name: "", address: "", email: "", phone: "", license: "", retention: "", transfers: "", law: "" };
   const [owner, setOwner] = useState<Owner>(empty);
   const q = useQuery({ queryKey: ["admin", "owner"], queryFn: async () => { const { data, error } = await supabase.from("site_content").select("data").eq("key", "owner").maybeSingle(); if (error) throw new Error("Dati non disponibili"); return data?.data as Partial<Owner> | undefined; } });
   useEffect(() => { if (q.data) setOwner({ ...empty, ...q.data }); }, [q.data]);
   const save = useServerFn(saveContent), s = useStatus();
-  const labels: Record<keyof Owner, string> = { name: "Nome o ragione sociale", address: "Indirizzo", email: "Email pubblica di contatto", phone: "Telefono pubblico", license: "Numero licenza (se esiste)" };
-  return <Card title="Titolare e pagine legali">{q.error && <p role="alert" className="text-destructive">Impossibile caricare i dati.</p>}{(Object.keys(labels) as (keyof Owner)[]).map(k => <Text key={k} label={labels[k]} hint="Se vuoto, compare DA COMPLETARE" value={owner[k]} onChange={v => setOwner({ ...owner, [k]: v })} />)}{s.view}<Button className={btn} disabled={s.busy || q.isLoading || !!q.error} onClick={() => s.run(() => save({ data: { key: "owner", data: owner } }))}>Salva dati titolare</Button></Card>;
+  const labels: Record<keyof Owner, string> = { name: "Nome o ragione sociale", address: "Indirizzo", email: "Email pubblica di contatto", phone: "Telefono pubblico", license: "Numero licenza (se esiste)", retention: "Privacy – per quanto tempo conservi log, messaggi e preventivi", transfers: "Privacy – fornitori e Paesi dove sono trattati i dati", law: "Termini – legge applicabile e foro" };
+  return <Card title="Titolare e pagine legali">{q.error && <p role="alert" className="text-destructive">Impossibile caricare i dati.</p>}{(Object.keys(labels) as (keyof Owner)[]).map(k => <Text key={k} label={labels[k]} hint="Se vuoto, non viene mostrato ai visitatori" value={owner[k]} onChange={v => setOwner({ ...owner, [k]: v })} />)}{s.view}<Button className={btn} disabled={s.busy || q.isLoading || !!q.error} onClick={() => s.run(() => save({ data: { key: "owner", data: owner } }))}>Salva dati titolare</Button></Card>;
 }

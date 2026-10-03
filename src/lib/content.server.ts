@@ -100,14 +100,17 @@ function toPkg(r: Row, lang: Locale): Pkg {
 
 const enHome: HomeText = {
   heroEyebrow: "Watamu · Malindi · Kenya",
-  heroTitle: "Kenya, experienced up close.",
-  heroText: "Safaris and excursions guided by someone who truly knows this land.",
+  heroTitle: "The real Kenya, from the Watamu sea to the savanna",
+  heroText: "Safaris in 4x4 jeeps with pop-up roof and sea and land excursions, with a licensed Italian-speaking guide.",
   heroNote: "Local Italian-speaking guide",
-  introTitle: "Not just another tour. Your encounter with Kenya.",
+  introTitle: "Why choose us",
   why: [
-    { title: "Local knowledge", text: "Journeys shaped by first-hand knowledge of parks and coast." },
-    { title: "In Italian", text: "A licensed Italian-speaking guide to experience and understand every moment." },
-    { title: "Safety", text: "Professional drivers, 4x4 vehicles and full safari insurance." },
+    { title: "Licensed Italian-speaking guide", text: "A licensed guide who speaks Italian and a professional driver throughout your trip." },
+    { title: "4x4 jeep with pop-up roof", text: "To watch and photograph wildlife during every game drive." },
+    { title: "Park fees and water included", text: "Park entrance fees and water during game drives are included." },
+    { title: "Full safari insurance", text: "Coverage with a replacement vehicle and assistance." },
+    { title: "All-inclusive at the lodges", text: "All-inclusive board at the lodges (drinks with meals excluded), with pick-up from your resort in Watamu for short safaris." },
+    { title: "Tailor-made on WhatsApp", text: "Packages built around you, by messaging us directly on WhatsApp." },
   ],
   featuredTitle: "Featured safaris",
   featuredIntro: "From Tsavo's red earth to the plains of Masai Mara.",
@@ -161,7 +164,7 @@ export function buildContent(raw: Raw, lang: Locale): SiteContent {
   }));
   const it = lang === "it";
   return {
-    owner: { name: "", address: "", email: "", phone: "", license: "", ...c["owner"] },
+    owner: { name: "", address: "", email: "", phone: "", license: "", retention: "", transfers: "", law: "", ...c["owner"] },
     lang,
     whatsapp,
     template: it ? settings.template || "Ciao Africano! Vorrei informazioni su {pacchetto}." : enTemplate,

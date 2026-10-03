@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site";
 import { Link, Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
@@ -127,7 +128,7 @@ function Login() {
     e.preventDefault();
     if (forgot) {
       run(async () => {
-        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${window.location.origin}/reset-password` });
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${SITE_URL}/reset-password` });
         if (error) throw new Error("Invio non riuscito. Riprova tra poco.");
       }, "Se l'indirizzo è corretto, riceverai un'email con il link per scegliere una nuova password.");
     } else {
