@@ -6,7 +6,8 @@ import wildlife from "@/assets/kenya-wildlife.webp";
 import creek from "@/assets/mida-creek.webp";
 import { counterpart } from "@/lib/seo";
 import { useContent } from "@/lib/content-client";
-import { phoneLabel, whatsappHref, type Kind, type Locale, type Pkg } from "@/lib/content-types";
+import { phoneLabel, whatsappHref, type Kind, type Locale, type Pkg, type Photo } from "@/lib/content-types";
+import { useEffect, useState } from "react";
 const nav = {
   it: ["Safari", "Escursioni", "Parchi", "Chi siamo", "Galleria", "Contatti"],
   en: ["Safaris", "Excursions", "Parks", "About", "Gallery", "Contact"],
@@ -343,22 +344,12 @@ export function SimplePage({ lang, type }: { lang: Locale; type: "about" | "gall
       <section className="simple band">
         <p className="lead">{t.text}</p>
         {type === "gallery" ? (
-          <div className="gallery">
-            {c.photos.length > 0 ? (
-              c.photos.map((ph) => (
-                <a key={ph.id} href={ph.src} target="_blank" rel="noreferrer" title={ph.caption}>
-                  <img src={ph.thumb} alt={ph.alt} width="480" height={Math.round((480 * ph.height) / ph.width)} loading="lazy" />
-                </a>
-              ))
-            ) : (
-              <>
-                <img src={safariHero} alt="Kenyan safari" width="1600" height="1000" loading="lazy" />
-                <img src={coast} alt="Watamu coast" width="1200" height="800" loading="lazy" />
-                <img src={wildlife} alt="Elephant in Tsavo" width="1200" height="800" loading="lazy" />
-                <img src={creek} alt="Mida Creek" width="1200" height="800" loading="lazy" />
-              </>
-            )}
-          </div>
+          <Gallery lang={lang} photos={c.photos.length > 0 ? c.photos : [
+            { id: "t1", src: safariHero, thumb: safariHero, width: 1600, height: 1000, caption: "Safari", alt: "Kenyan safari", category: "safari" },
+            { id: "t2", src: coast, thumb: coast, width: 1200, height: 800, caption: "Watamu", alt: "Watamu coast", category: "mare" },
+            { id: "t3", src: wildlife, thumb: wildlife, width: 1200, height: 800, caption: "Tsavo", alt: "Elephant in Tsavo", category: "safari" },
+            { id: "t4", src: creek, thumb: creek, width: 1200, height: 800, caption: "Mida Creek", alt: "Mida Creek", category: "mare" },
+          ]} />
         ) : (
           <a className="button" href={whatsappHref(c, type === "contact" ? (lang === "it" ? "un viaggio in Kenya" : "a trip to Kenya") : "ECO TOURS AND SAFARI'S")} target="_blank" rel="noreferrer">
             WhatsApp · {phoneLabel(c.whatsapp)}
@@ -366,6 +357,41 @@ export function SimplePage({ lang, type }: { lang: Locale; type: "about" | "gall
         )}
       </section>
     </Shell>
+  );
+}
+function Gallery({ photos, lang }: { photos: Photo[]; lang: Locale }) {
+  const [open, setOpen] = useState<number | null>(null);
+  const go = (d: number) => setOpen((i) => (i === null ? i : (i + d + photos.length) % photos.length));
+  useEffect(() => {
+    if (open === null) return;
+    const key = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(null); if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1); };
+    document.addEventListener("keydown", key);
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", key); document.body.style.overflow = ""; };
+  }, [open]);
+  const cur = open === null ? null : photos[open];
+  return (
+    <>
+      <div className="gallery">
+        {photos.map((ph, i) => (
+          <button key={ph.id} type="button" className="gallery-item" onClick={() => setOpen(i)} aria-label={(lang === "it" ? "Ingrandisci: " : "Enlarge: ") + (ph.caption || ph.alt)}>
+            <img src={ph.thumb} srcSet={ph.thumb !== ph.src ? `${ph.thumb} 640w, ${ph.src} ${ph.width}w` : undefined} sizes="(max-width: 860px) 50vw, 33vw" alt={ph.alt} width={ph.width} height={ph.height} loading={i < 6 ? "eager" : "lazy"} decoding="async" />
+            {ph.caption && <span>{ph.caption}</span>}
+          </button>
+        ))}
+      </div>
+      {cur && (
+        <div className="lightbox" role="dialog" aria-modal="true" aria-label={cur.caption || cur.alt} onClick={() => setOpen(null)}>
+          <img src={cur.src} alt={cur.alt} width={cur.width} height={cur.height} onClick={(e) => e.stopPropagation()} />
+          <p>{cur.caption} <small>{(open ?? 0) + 1} / {photos.length}</small></p>
+          <button type="button" className="lb-close" aria-label={lang === "it" ? "Chiudi" : "Close"} onClick={() => setOpen(null)}>×</button>
+          {photos.length > 1 && <>
+            <button type="button" className="lb-prev" aria-label={lang === "it" ? "Precedente" : "Previous"} onClick={(e) => { e.stopPropagation(); go(-1); }}>‹</button>
+            <button type="button" className="lb-next" aria-label={lang === "it" ? "Successiva" : "Next"} onClick={(e) => { e.stopPropagation(); go(1); }}>›</button>
+          </>}
+        </div>
+      )}
+    </>
   );
 }
 function PageHero({ title, text, image, kicker }: { title: string; text: string; image: string; kicker?: string }) {
