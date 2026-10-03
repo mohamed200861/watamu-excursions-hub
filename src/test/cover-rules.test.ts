@@ -13,6 +13,6 @@ describe('Cover rules', () => {
 });
 describe('Legal page rules', () => {
   it('maps Italian terms to English terms', () => expect(counterpart('it','termini')).toBe('/en/terms'));
-  it('marks unknown controller fields incomplete', () => expect(ownerEntries({name:'',address:'',email:'',phone:'',license:''},'it').map(p=>p[1])).toEqual(Array(5).fill('DA COMPLETARE')));
-  it('uses the actual package cover for social images', () => { const head=headFor('it','Test','Test','/it/safari/test',undefined,'/api/public/img/covers/abc-og.webp'); expect(head.meta.find(m=>'property' in m&&m.property==='og:image')?.content).toBe('https://watamu-excursions-hub.lovable.app/api/public/img/covers/abc-og.webp'); });
+  it('hides empty controller fields from visitors', () => expect(ownerEntries({name:'',address:'',email:'',phone:'',license:'',retention:'',transfers:'',law:''},'it')).toEqual([]));
+  it('uses the actual package cover for social images', () => { const head=headFor('it','Test','Test','/it/safari/test',undefined,'/api/public/img/covers/abc-og.webp'); expect(head.meta.find(m=>'property' in m&&m.property==='og:image')?.content).toBe('https://ecotoursandsafaris.it/api/public/img/covers/abc-og.webp'); });
 });
