@@ -142,8 +142,8 @@ export const registerPhoto = createServerFn({ method: "POST" })
       .object({
         path: photoPath,
         thumb_path: photoPath,
-        width: z.number().int().min(1).max(1600),
-        height: z.number().int().min(1).max(1600),
+        width: z.number().int().min(1).max(2560),
+        height: z.number().int().min(1).max(2560),
         caption: str(300),
         alt: str(300),
         category: z.enum(["safari", "mare", "persone"]),

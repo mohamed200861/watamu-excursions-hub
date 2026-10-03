@@ -227,8 +227,20 @@
 .info ul { padding-left: 1.1rem; color: var(--muted-foreground); line-height: 1.7; font-size: .9rem; }
 .lead { font-family: var(--font-display); font-size: clamp(1.8rem,4vw,3rem); max-width: 52rem; color: var(--foreground)!important; }
 .simple .button { margin-top: 2rem; }
-.gallery { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; margin-top: 3rem; }
-.gallery img { width: 100%; aspect-ratio: 3/2; object-fit: cover; }
+.gallery { columns: 3 18rem; column-gap: 1rem; margin-top: 3rem; }
+.gallery-item { display: block; width: 100%; margin: 0 0 1rem; padding: 0; border: 0; background: var(--muted); border-radius: calc(var(--radius) * 2); overflow: hidden; cursor: zoom-in; position: relative; break-inside: avoid; }
+.gallery-item img { width: 100%; height: auto; display: block; transition: transform .5s ease; }
+.gallery-item:hover img { transform: scale(1.04); }
+.gallery-item span { position: absolute; left: 0; right: 0; bottom: 0; padding: 2rem 1rem .8rem; text-align: left; font-size: .8rem; color: var(--primary-foreground); background: linear-gradient(transparent, color-mix(in oklab, var(--primary) 85%, transparent)); }
+.lightbox { position: fixed; inset: 0; z-index: 60; background: color-mix(in oklab, var(--primary) 94%, black); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; animation: lbIn .2s ease; }
+.lightbox img { max-width: 100%; max-height: 84vh; width: auto; height: auto; object-fit: contain; border-radius: var(--radius); }
+.lightbox p { color: var(--primary-foreground); margin: 1rem 0 0; font-size: .9rem; }
+.lightbox small { opacity: .7; margin-left: .6rem; }
+.lightbox button { position: absolute; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--primary-foreground); background: transparent; color: var(--primary-foreground); font-size: 1.8rem; line-height: 1; cursor: pointer; }
+.lb-close { top: 1rem; right: 1rem; }
+.lb-prev { left: 1rem; top: 50%; }
+.lb-next { right: 1rem; top: 50%; }
+@keyframes lbIn { from { opacity: 0; } }
 footer { background: var(--primary); color: var(--primary-foreground); padding: 4rem max(1rem,calc((100vw - 76rem)/2)); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3rem; align-items: end; }
 footer > div:first-child { display: flex; align-items: center; gap: 1rem; }
 footer h2 { font-size: 1.2rem; line-height: 1.1; }
@@ -251,7 +263,9 @@ footer p { opacity: .72; line-height: 1.6; }
   .split-feature img { min-height: 20rem; }
   .section-head { display: block; }
   .detail { grid-template-columns: 1fr; gap: 2rem; }
-  .gallery { grid-template-columns: 1fr; }
+  .gallery { columns: 2; column-gap: .6rem; }
+  .gallery-item { margin-bottom: .6rem; }
+  .lb-prev, .lb-next { top: auto; bottom: 1rem; }
   .footer-links { justify-content: start; }
   .whatsapp-float { display: flex; }
 }

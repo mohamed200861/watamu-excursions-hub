@@ -16,13 +16,15 @@ async function toWebp(img: ImageBitmap, max: number, quality: number) {
   canvas.height = height;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Il browser non supporta la conversione delle immagini.");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
   ctx.drawImage(img, 0, 0, width, height);
   const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/webp", quality));
   if (!blob || blob.type !== "image/webp") throw new Error("Conversione in WebP non supportata da questo browser.");
   return { blob, width, height };
 }
 
-/** Resizes in the browser: full image max 1600 px and 480 px thumbnail, both WebP. */
+/** Resizes in the browser: full image max 2560 px (never upscaled) and 640 px thumbnail, both WebP. */
 export async function prepareImage(f: File) {
   let bmp: ImageBitmap;
   try {
@@ -30,8 +32,8 @@ export async function prepareImage(f: File) {
   } catch {
     throw new Error(`Impossibile leggere “${f.name}”. Prova con una foto JPG o PNG.`);
   }
-  const full = await toWebp(bmp, 1600, 0.82);
-  const thumb = await toWebp(bmp, 480, 0.78);
+  const full = await toWebp(bmp, 2560, 0.92);
+  const thumb = await toWebp(bmp, 640, 0.85);
   bmp.close();
   return { full, thumb };
 }
