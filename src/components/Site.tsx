@@ -73,9 +73,7 @@ export function Shell({ lang, children, subject }: { lang: Locale; children: Rea
           </Link>
         </nav>
         <div className="header-actions">
-          <a href={otherPath} className="lang">
-            {other.toUpperCase()}
-          </a>
+          {parts[2] ? <Link to="/$lang/$section/$slug" params={{ lang: other, section: otherPath.split("/")[2] ?? "", slug: parts[2] }} className="lang">{other.toUpperCase()}</Link> : parts[1] ? <Link to="/$lang/$section" params={{ lang: other, section: otherPath.split("/")[2] ?? "" }} className="lang">{other.toUpperCase()}</Link> : <Link to="/$lang" params={{ lang: other }} className="lang">{other.toUpperCase()}</Link>}
           <details className="mobile-menu">
             <summary aria-label={lang === "it" ? "Apri menu" : "Open menu"}>☰</summary>
             <div>
