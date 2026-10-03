@@ -4,7 +4,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { claimAdmin } from "@/lib/admin.functions";
 import { Card, Field, btn, btnGhost, input, useStatus } from "@/components/admin/ui";
 import { PasswordForm } from "@/components/admin/PasswordForm";
 
@@ -163,30 +162,14 @@ function Login() {
   );
 }
 
-function NotAdmin({ onClaimed }: { onClaimed: () => void }) {
-  const claim = useServerFn(claimAdmin);
-  const { run, busy, view, setStatus } = useStatus();
+function NotAdmin(_: { onClaimed: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
         <Card title="Account non abilitato">
           <p className="text-sm text-muted-foreground">
-            Questo account non ha accesso alla gestione. Se è il primo accesso al sito, puoi attivarlo come unico amministratore.
+            Questo account non ha accesso alla gestione. Chiedi a un amministratore di aggiungerti dalla pagina Account.
           </p>
-          {view}
-          <button
-            className={`${btn} w-full`}
-            disabled={busy}
-            onClick={() =>
-              run(async () => {
-                const r = await claim();
-                if (r.ok) onClaimed();
-                else setTimeout(() => setStatus({ type: "err", text: "Esiste già un amministratore." }), 0);
-              }, "")
-            }
-          >
-            Attiva come amministratore
-          </button>
           <button className={`${btnGhost} w-full`} onClick={() => supabase.auth.signOut()}>Esci</button>
         </Card>
       </div>
