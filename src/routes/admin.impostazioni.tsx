@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { exportBackup, saveContent } from "@/lib/admin.functions";
-import { Area, Card, Text, btn, useStatus } from "@/components/admin/ui";
+import type { Owner } from "@/lib/content-types";
+import { Button, Area, Card, Text, btn, useStatus } from "@/components/admin/ui";
 
 export const Route = createFileRoute("/admin/impostazioni")({ component: SettingsPage });
 
@@ -52,6 +53,7 @@ function SettingsPage() {
 
   return (
     <div className="space-y-4">
+      <OwnerEditor />
       <Card title="WhatsApp">
         <Text label="Numero WhatsApp" hint="Solo cifre con prefisso internazionale, senza + (es. 254742161072)" value={whatsapp} onChange={setWhatsapp} />
         <Area
@@ -102,4 +104,14 @@ function SettingsPage() {
       </Card>
     </div>
   );
+}
+
+function OwnerEditor() {
+  const empty: Owner = { name: "", address: "", email: "", phone: "", license: "" };
+  const [owner, setOwner] = useState<Owner>(empty);
+  const q = useQuery({ queryKey: ["admin", "owner"], queryFn: async () => { const { data, error } = await supabase.from("site_content").select("data").eq("key", "owner").maybeSingle(); if (error) throw new Error("Dati non disponibili"); return data?.data as Partial<Owner> | undefined; } });
+  useEffect(() => { if (q.data) setOwner({ ...empty, ...q.data }); }, [q.data]);
+  const save = useServerFn(saveContent), s = useStatus();
+  const labels: Record<keyof Owner, string> = { name: "Nome o ragione sociale", address: "Indirizzo", email: "Email pubblica di contatto", phone: "Telefono pubblico", license: "Numero licenza (se esiste)" };
+  return <Card title="Titolare e pagine legali">{q.error && <p role="alert" className="text-destructive">Impossibile caricare i dati.</p>}{(Object.keys(labels) as (keyof Owner)[]).map(k => <Text key={k} label={labels[k]} hint="Se vuoto, compare DA COMPLETARE" value={owner[k]} onChange={v => setOwner({ ...owner, [k]: v })} />)}{s.view}<Button className={btn} disabled={s.busy || q.isLoading || !!q.error} onClick={() => s.run(() => save({ data: { key: "owner", data: owner } }))}>Salva dati titolare</Button></Card>;
 }
