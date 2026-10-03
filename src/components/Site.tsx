@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import logo from "@/assets/eco-tours-logo.svg.asset.json";
+const logo = { url: "/eco-tours-logo.svg" };
 import safariHero from "@/assets/safari-hero.webp";
 import coast from "@/assets/watamu-coast.webp";
 import wildlife from "@/assets/kenya-wildlife.webp";
