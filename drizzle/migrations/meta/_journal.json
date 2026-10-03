@@ -15,6 +15,13 @@
       "when": 1790975146527,
       "tag": "0001_gallery_public_read",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791042203638,
+      "tag": "0002_package_covers",
+      "breakpoints": true
     }
   ]
 }
