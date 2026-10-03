@@ -8,3 +8,8 @@
 - [x] Test completo con utente temporaneo (recupero password: invio email non verificabile da qui)
 - [x] Livello 4/5: sitemap.xml bilingue, robots.txt bot AI, llms.txt, JSON-LD, 404/500, accessibilità
 - [x] Guida 1 pagina per il titolare
+
+- [ ] Pagine legali bilingue e dati titolare modificabili
+- [ ] Copertine pacchetti, miniature, ritaglio e condivisione
+- [ ] Schede pacchetti e footer richiesti
+- [ ] Sitemap, llms e test di regressione
