@@ -14,7 +14,7 @@ function renderAt(path: string) {
     context: { queryClient },
     history: createMemoryHistory({ initialEntries: [path] }),
   });
-  router.routeTree.update({ shellComponent: undefined });
+  Object.assign(router.routeTree.options, { shellComponent: undefined });
   return render(<RouterProvider router={router} />);
 }
 
