@@ -80,14 +80,14 @@ function clean(v: Any): Any {
 
 function HomeForm({ v, set }: { v: Any; set: (v: Any) => void }) {
   const f = (k: string) => ({ value: v[k] ?? "", onChange: (x: string) => set({ ...v, [k]: x }) });
-  const why: Any[] = v.why ?? [{}, {}, {}];
+  const why: Any[] = [...(v.why ?? []), {}, {}, {}, {}, {}, {}].slice(0, 6);
   return (
     <>
       <Text label="Riga sopra il titolo" {...f("heroEyebrow")} />
       <Text label="Titolo principale" {...f("heroTitle")} />
       <Area label="Testo sotto il titolo" {...f("heroText")} />
       <Text label="Etichetta in basso nella foto" {...f("heroNote")} />
-      <Text label="Titolo sezione “Perché noi”" {...f("introTitle")} />
+      <Text label="Titolo sezione “Perché scegliere noi”" {...f("introTitle")} />
       {why.map((w, i) => (
         <div key={i} className="space-y-2 rounded-md border border-border p-3">
           <Text label={`Punto ${i + 1} – titolo`} value={w.title ?? ""} onChange={(x) => set({ ...v, why: why.map((o, j) => (j === i ? { ...o, title: x } : o)) })} />

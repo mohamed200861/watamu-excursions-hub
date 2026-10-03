@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Home } from "@/components/Site";
 import { loadContent } from "@/lib/content-client";
-import { agencySchema, getLocale, headFor } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
+import { agencySchema, getLocale, headFor, pageSeo } from "@/lib/seo";
 
 export const Route = createFileRoute("/$lang/")({
   loader: async ({ params }) => {
@@ -12,21 +13,15 @@ export const Route = createFileRoute("/$lang/")({
   head: ({ params, loaderData }) => {
     const l = getLocale(params.lang);
     const faq = loaderData?.faq ?? [];
-    return headFor(
-      l,
-      l === "it" ? "Safari ed escursioni in Kenya" : "Safaris and excursions in Kenya",
-      l === "it"
-        ? "Safari ed escursioni autentiche in Kenya con guida locale in italiano, da Watamu e Malindi."
-        : "Authentic Kenya safaris and excursions with a local Italian-speaking guide, from Watamu and Malindi.",
-      `/${l}`,
-      {
-        "@context": "https://schema.org",
-        "@graph": [
-          agencySchema(loaderData?.whatsapp ?? "254742161072"),
-          { "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
-        ],
-      },
-    );
+    const [title, description] = pageSeo[`${l}:home`]!;
+    return headFor(l, title, description, `/${l}`, {
+      "@context": "https://schema.org",
+      "@graph": [
+        agencySchema(loaderData?.whatsapp ?? "254742161072"),
+        { "@type": "WebSite", "@id": `${SITE_URL}/#website`, url: SITE_URL, name: "ECO TOURS AND SAFARI'S", inLanguage: ["it", "en"], publisher: { "@id": `${SITE_URL}/#organization` } },
+        { "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
+      ],
+    }, "/eco-tours-og.webp");
   },
   component: Page,
 });

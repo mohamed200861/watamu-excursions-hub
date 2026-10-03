@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { SITE_HOST, SITE_URL } from "./lib/site";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -47,9 +48,18 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const url = new URL(request.url);
+      // www → apex permanent redirect
+      if (url.host === `www.${SITE_HOST}`) return Response.redirect(`${SITE_URL}${url.pathname}${url.search}`, 301);
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const response = await normalizeCatastrophicSsrResponse(await handler.fetch(request, env, ctx));
+      // Only the final domain is indexable; previews and other hosts get noindex.
+      if (url.host !== SITE_HOST) {
+        const r = new Response(response.body, response);
+        r.headers.set("X-Robots-Tag", "noindex, nofollow");
+        return r;
+      }
+      return response;
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {

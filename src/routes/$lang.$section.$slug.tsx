@@ -1,7 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { DetailPage } from "@/components/Site";
 import { loadContent } from "@/lib/content-client";
-import { agencySchema, getLocale, headFor, kindFor } from "@/lib/seo";
+import { abs, agencySchema, detailSeo, getLocale, headFor, kindFor } from "@/lib/seo";
 
 export const Route = createFileRoute("/$lang/$section/$slug")({
   loader: async ({ params }) => {
@@ -10,18 +10,20 @@ export const Route = createFileRoute("/$lang/$section/$slug")({
     const c = await loadContent(getLocale(params.lang));
     const item = c[kind].find((x) => x.slug === params.slug);
     if (!item) throw notFound();
-    return { kind, title: item.title, description: item.description, whatsapp: c.whatsapp, image: item.cover ? `https://watamu-excursions-hub.lovable.app/api/public/img/${item.cover.og_path}` : undefined };
+    return { kind, title: item.title, description: item.description, whatsapp: c.whatsapp, image: item.cover ? `/api/public/img/${item.cover.og_path}` : undefined };
   },
   staleTime: 60_000,
   head: ({ params, loaderData }) => {
     const l = getLocale(params.lang);
     const path = `/${l}/${params.section}/${params.slug}`;
-    if (!loaderData) return headFor(l, l === "it" ? "Esperienza non trovata" : "Experience not found", "ECO TOURS AND SAFARI'S", path);
+    if (!loaderData) return headFor(l, l === "it" ? "Esperienza non trovata" : "Experience not found", "ECO TOURS AND SAFARI'S", path, undefined, undefined, true);
     const { kind, title, description, whatsapp, image } = loaderData;
+    const [seoTitle, seoDesc] = detailSeo(l, kind, title);
+    const img = image ? abs(image) : undefined;
     const primary =
       kind === "safari"
-        ? { "@type": "TouristTrip", name: title, description, touristType: "Safari", provider: { "@type": "TravelAgency", name: "ECO TOURS AND SAFARI'S" } }
-        : { "@type": "TouristAttraction", name: title, description };
+        ? { "@type": "TouristTrip", name: title, description, url: abs(path), touristType: "Safari", ...(img ? { image: img } : {}), provider: { "@id": abs("/#organization") } }
+        : { "@type": "TouristAttraction", name: title, description, url: abs(path), ...(img ? { image: img } : {}) };
     const schema = {
       "@context": "https://schema.org",
       "@graph": [
@@ -30,14 +32,14 @@ export const Route = createFileRoute("/$lang/$section/$slug")({
         {
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: `/${l}` },
-            { "@type": "ListItem", position: 2, name: params.section, item: `/${l}/${params.section}` },
-            { "@type": "ListItem", position: 3, name: title, item: path },
+            { "@type": "ListItem", position: 1, name: "Home", item: abs(`/${l}`) },
+            { "@type": "ListItem", position: 2, name: params.section, item: abs(`/${l}/${params.section}`) },
+            { "@type": "ListItem", position: 3, name: title, item: abs(path) },
           ],
         },
       ],
     };
-    return headFor(l, title, description, path, schema, image);
+    return headFor(l, seoTitle, seoDesc, path, schema, image ?? "/eco-tours-og.webp");
   },
   component: Page,
 });

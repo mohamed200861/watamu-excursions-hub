@@ -1,6 +1,6 @@
-const origin = "https://watamu-excursions-hub.lovable.app";
-const absolute = (path: string) => path.startsWith("https://") ? path : `${origin}${path}`;
 import type { Kind, Locale, SiteContent } from "@/lib/content-types";
+import { SITE_URL, clamp } from "@/lib/site";
+const absolute = (path: string) => (path.startsWith("https://") ? path : `${SITE_URL}${path}`);
 
 const sectionMap: Record<Locale, Record<string, string>> = {
   it: { safari: "safaris", escursioni: "excursions", parchi: "parks", "chi-siamo": "about", galleria: "gallery", contatti: "contact", privacy: "privacy", cookie: "cookie", termini: "terms" },
@@ -14,21 +14,63 @@ export function counterpart(lang: Locale, section?: string, slug?: string) {
   if (!section) return `/${other}`;
   return `/${other}/${sectionMap[lang][section] ?? section}${slug ? `/${slug}` : ""}`;
 }
-export function headFor(lang: Locale, title: string, description: string, path: string, schema?: object, image?: string) {
+
+/** Page titles (≤60) and descriptions (≤155): service + place + real benefit, only facts already on the site. */
+export const pageSeo: Record<string, [string, string]> = {
+  "it:home": ["Safari in Kenya ed escursioni a Watamu | Eco Tours", "Safari in jeep 4x4 con tettuccio apribile ed escursioni via mare e terra da Watamu, con guida autorizzata in italiano e ingressi ai parchi inclusi."],
+  "en:home": ["Kenya Safaris and Watamu Excursions | Eco Tours", "Safaris in 4x4 jeeps with pop-up roof and sea and land excursions from Watamu, with a licensed Italian-speaking guide and park fees included."],
+  "it:safari": ["Safari in Kenya da Watamu e Nairobi | Eco Tours", "Safari da 2 a 7 giorni tra Tsavo, Amboseli, Masai Mara e Taita Hills in jeep 4x4, con guida autorizzata in italiano e assicurazione inclusa."],
+  "en:safaris": ["Kenya Safaris from Watamu and Nairobi | Eco Tours", "2 to 7-day safaris across Tsavo, Amboseli, Masai Mara and Taita Hills in 4x4 jeeps, with a licensed Italian-speaking guide and insurance."],
+  "it:escursioni": ["Escursioni a Watamu e Malindi via mare e terra", "Safari Blu, Sardegna Due, Isola dell'Amore, Rovine di Gede e Mida Creek: escursioni da Watamu con guida in italiano, su misura via WhatsApp."],
+  "en:excursions": ["Watamu and Malindi Sea and Land Excursions", "Safari Blu, Sardegna Due, Love Island, Gede Ruins and Mida Creek: excursions from Watamu with an Italian-speaking guide, tailored on WhatsApp."],
+  "it:parchi": ["Parchi del Kenya: Masai Mara, Tsavo e Amboseli", "Masai Mara, Amboseli, Lake Nakuru, Tsavo Est, Tsavo Ovest e Taita Hills: safari in jeep 4x4 con tettuccio apribile e guida in italiano."],
+  "en:parks": ["Kenya Parks: Masai Mara, Tsavo and Amboseli", "Masai Mara, Amboseli, Lake Nakuru, Tsavo East, Tsavo West and Taita Hills: safaris in 4x4 jeeps with pop-up roof and an Italian-speaking guide."],
+  "it:chi-siamo": ["Chi siamo | Guida autorizzata in italiano a Watamu", "Africano di Africa, guida autorizzata in italiano a Watamu: safari ed escursioni in Kenya con autista professionale e jeep 4x4."],
+  "en:about": ["About Us | Licensed Italian-Speaking Guide in Watamu", "Africano di Africa, a licensed Italian-speaking guide in Watamu: Kenya safaris and excursions with a professional driver and 4x4 jeeps."],
+  "it:galleria": ["Galleria foto safari e mare del Kenya | Eco Tours", "Foto dei safari nei parchi del Kenya, del mare di Watamu e delle persone incontrate durante le escursioni con Eco Tours and Safari's."],
+  "en:gallery": ["Kenya Safari and Sea Photo Gallery | Eco Tours", "Photos of safaris in Kenya's parks, the Watamu sea and the people met during excursions with Eco Tours and Safari's."],
+  "it:contatti": ["Contatti | Safari ed escursioni a Watamu su WhatsApp", "Scrivi ad Africano di Africa su WhatsApp per pacchetti su misura: safari in Kenya ed escursioni a Watamu e Malindi con guida in italiano."],
+  "en:contact": ["Contact | Watamu Safaris and Excursions on WhatsApp", "Message Africano di Africa on WhatsApp for tailor-made packages: Kenya safaris and Watamu and Malindi excursions with an Italian-speaking guide."],
+  "it:privacy": ["Informativa privacy | Eco Tours and Safari's", "Come Eco Tours and Safari's tratta i dati di navigazione: nessun modulo di contatto, solo cookie tecnici, diritti GDPR e contatti del titolare."],
+  "en:privacy": ["Privacy Notice | Eco Tours and Safari's", "How Eco Tours and Safari's handles browsing data: no contact forms, only technical cookies, GDPR rights and controller contacts."],
+  "it:cookie": ["Informativa cookie | Eco Tours and Safari's", "Il sito usa solo cookie tecnici necessari: nessun analytics, nessun pixel pubblicitario e nessun cookie di profilazione."],
+  "en:cookie": ["Cookie Notice | Eco Tours and Safari's", "This site only uses necessary technical cookies: no analytics, no advertising pixels and no profiling cookies."],
+  "it:termini": ["Condizioni di servizio | Eco Tours and Safari's", "Condizioni per safari ed escursioni in Kenya: programmi indicativi, preventivi su WhatsApp, incluso ed escluso come da scheda pacchetto."],
+  "en:terms": ["Terms of Service | Eco Tours and Safari's", "Terms for Kenya safaris and excursions: indicative itineraries, quotations on WhatsApp, inclusions and exclusions as listed in each package."],
+};
+
+export function detailSeo(lang: Locale, kind: Kind, title: string): [string, string] {
+  const it = lang === "it";
+  const suffix = kind === "safari" ? (it ? " | Safari in Kenya da Watamu" : " | Kenya Safari from Watamu") : kind === "excursions" ? (it ? " | Escursione a Watamu" : " | Watamu Excursion") : it ? " | Parco del Kenya" : " | Kenya Park";
+  const t = title.length + suffix.length <= 60 ? title + suffix : clamp(title, 60);
+  const d =
+    kind === "safari"
+      ? it ? `${title}: safari in jeep 4x4 con tettuccio apribile, guida autorizzata in italiano, ingressi e assicurazione inclusi.` : `${title}: safari in a 4x4 jeep with pop-up roof, licensed Italian-speaking guide, park fees and insurance included.`
+      : kind === "excursions"
+        ? it ? `${title} da Watamu con guida in italiano: programma, cosa è incluso e prenotazione diretta su WhatsApp.` : `${title} from Watamu with an Italian-speaking guide: programme, inclusions and direct booking on WhatsApp.`
+        : it ? `${title}: safari in jeep 4x4 con tettuccio apribile e guida autorizzata in italiano, in partenza da Watamu.` : `${title}: safaris in a 4x4 jeep with pop-up roof and a licensed Italian-speaking guide, departing from Watamu.`;
+  return [t, clamp(d, 155)];
+}
+
+export function headFor(lang: Locale, title: string, description: string, path: string, schema?: object, image?: string, noindex = false) {
   const other = lang === "it" ? "en" : "it";
   const parts = path.split("/").filter(Boolean);
   const alt = counterpart(lang, parts[1], parts[2]);
+  const t = clamp(title, 60), d = clamp(description, 155);
   return {
     meta: [
-      { title: `${title} — ECO TOURS AND SAFARI'S` },
-      { name: "description", content: description },
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
+      { title: t },
+      { name: "description", content: d },
+      ...(noindex ? [{ name: "robots", content: "noindex, follow" }] : []),
+      { property: "og:title", content: t },
+      { property: "og:description", content: d },
       { property: "og:type", content: "website" },
       { property: "og:url", content: absolute(path) },
+      { property: "og:locale", content: lang === "it" ? "it_IT" : "en_GB" },
       ...(image ? [{ property: "og:image", content: absolute(image) }, { name: "twitter:image", content: absolute(image) }] : []),
       { name: "twitter:card", content: "summary_large_image" },
-
+      { name: "twitter:title", content: t },
+      { name: "twitter:description", content: d },
     ],
     links: [
       { rel: "canonical", href: absolute(path) },
@@ -45,13 +87,16 @@ export function kindFor(section: string): Kind | null {
   if (section === "parchi" || section === "parks") return "parks";
   return null;
 }
+export const abs = absolute;
 export function agencySchema(whatsapp: string) {
   return {
-    "@context": "https://schema.org",
     "@type": ["TravelAgency", "LocalBusiness"],
+    "@id": `${SITE_URL}/#organization`,
     name: "ECO TOURS AND SAFARI'S",
+    url: SITE_URL,
+    logo: `${SITE_URL}/eco-tours-logo.svg`,
+    image: `${SITE_URL}/eco-tours-og.webp`,
     founder: { "@type": "Person", name: "Africano di Africa" },
-
     address: { "@type": "PostalAddress", addressLocality: "Watamu", addressRegion: "Kilifi", addressCountry: "KE" },
     contactPoint: { "@type": "ContactPoint", telephone: `+${whatsapp}`, contactType: "reservations", availableLanguage: ["Italian", "English"] },
     knowsLanguage: ["it", "en"],

@@ -3,7 +3,7 @@ export type ImageKey = "safari" | "coast" | "wildlife" | "creek";
 export type Kind = "safari" | "excursions" | "parks";
 
 export type Cover = { path: string; thumb_path: string; og_path: string; alt: string; focal_x: number; focal_y: number };
-export type Owner = { name: string; address: string; email: string; phone: string; license: string };
+export type Owner = { name: string; address: string; email: string; phone: string; license: string; retention: string; transfers: string; law: string };
 
 export type Pkg = {
   cover?: Cover | null;
