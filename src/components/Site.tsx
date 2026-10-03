@@ -407,8 +407,16 @@ function WhatsAppIcon() {
   );
 }
 
+const seaSlugs = ["safari-blu", "isola-dell-amore", "sardegna-due", "isola-di-robinson"];
+const parkSlugs = ["masai-mara", "amboseli", "lake-nakuru", "tsavo-est", "tsavo-ovest", "taita-hills"];
+function fallbackPhoto(slug: string) {
+  if (seaSlugs.includes(slug)) return coast;
+  if (parkSlugs.includes(slug)) return safariHero;
+  if (["rovine-di-gede", "hells-kitchen-marafa", "vera-africa", "aperitivo-mida-creek"].includes(slug)) return creek;
+  return wildlife;
+}
 function PackagePhoto({ item, thumb = false }: { item: Pkg; thumb?: boolean }) {
-  if (!item.cover) return <div className={thumb ? "package-placeholder" : "package-placeholder cover-placeholder"} role="img" aria-label={item.title}><svg viewBox="0 0 120 80" aria-hidden="true"><path d="M8 64h104M18 64l34-38 25 38M61 42l14-18 30 40M85 10a7 7 0 1 0 .01 0" /></svg><span>ECO TOURS AND SAFARI'S</span></div>;
+  if (!item.cover) return <img src={fallbackPhoto(item.slug)} alt={item.title} width={thumb ? 480 : 1600} height={thumb ? 300 : 1000} loading={thumb ? "lazy" : "eager"} />;
   return <img src={`/api/public/img/${thumb ? item.cover.thumb_path : item.cover.path}`} alt={item.cover.alt} width={thumb ? 480 : 1600} height={thumb ? 300 : 1000} loading={thumb ? "lazy" : "eager"} fetchPriority={thumb ? "auto" : "high"} style={thumb ? undefined : { objectPosition: `${item.cover.focal_x}% ${item.cover.focal_y}%` }} />;
 }
 function InstagramIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".8" /></svg>; }
