@@ -50,15 +50,6 @@ const contentSchemas = {
 } as const;
 type ContentKey = keyof typeof contentSchemas;
 
-export const claimAdmin = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await (context.supabase as any).rpc("claim_admin");
-    fail(error, "Impossibile verificare l'account");
-    if (data) await (context.supabase as any).from("audit_log").insert({ user_id: context.userId, action: "admin.claim", detail: {} });
-    return { ok: !!data };
-  });
-
 export const saveContent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => {

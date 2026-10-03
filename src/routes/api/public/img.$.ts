@@ -7,15 +7,11 @@ export const Route = createFileRoute("/api/public/img/$")({
       GET: async ({ params }) => {
         const path = params._splat ?? "";
         if (!/^[a-z0-9-]+\/[a-z0-9-]+\.webp$/.test(path)) return new Response("Not found", { status: 404 });
-        const url = process.env["SUPABASE_URL"];
-        const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-        if (!url || !key) return new Response("Unavailable", { status: 503 });
-        const headers: Record<string, string> = { apikey: key };
-        if (!key.startsWith("sb_")) headers["Authorization"] = `Bearer ${key}`;
         try {
-          const r = await fetch(`${url}/storage/v1/object/authenticated/gallery/${path}`, { headers, signal: AbortSignal.timeout(8000) });
-          if (!r.ok) return new Response("Not found", { status: 404 });
-          return new Response(r.body, {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data, error } = await supabaseAdmin.storage.from("gallery").download(path);
+          if (error || !data) return new Response("Not found", { status: 404 });
+          return new Response(data.stream(), {
             headers: { "content-type": "image/webp", "cache-control": "public, max-age=31536000, immutable" },
           });
         } catch {
