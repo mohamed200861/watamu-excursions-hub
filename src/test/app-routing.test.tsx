@@ -3,6 +3,8 @@ import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/rea
 import { cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("@/lib/content.functions", async () => { const { buildContent } = await import("@/lib/content.server"); const { default: snapshot } = await import("@/lib/content-snapshot.json"); return { getSiteContent: async ({ data }: { data: { lang: "it" | "en" } }) => buildContent(snapshot, data.lang) }; });
+
 import { routeTree } from "@/routeTree.gen";
 
 function renderAt(path: string) {
@@ -12,6 +14,7 @@ function renderAt(path: string) {
     context: { queryClient },
     history: createMemoryHistory({ initialEntries: [path] }),
   });
+  Object.assign(router.routeTree.options, { shellComponent: undefined });
   return render(<RouterProvider router={router} />);
 }
 

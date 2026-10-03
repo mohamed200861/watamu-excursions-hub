@@ -4,6 +4,7 @@ import safariHero from "@/assets/safari-hero.webp";
 import coast from "@/assets/watamu-coast.webp";
 import wildlife from "@/assets/kenya-wildlife.webp";
 import creek from "@/assets/mida-creek.webp";
+import { counterpart } from "@/lib/seo";
 import { useContent } from "@/lib/content-client";
 import { phoneLabel, whatsappHref, type Kind, type Locale, type Pkg } from "@/lib/content-types";
 const nav = {
@@ -29,15 +30,16 @@ const paths = {
     contact: "contact",
   },
 };
-export function Shell({ lang, children }: { lang: Locale; children: React.ReactNode }) {
+export function Shell({ lang, children, subject }: { lang: Locale; children: React.ReactNode; subject?: string }) {
   const p = paths[lang];
   const c = useContent();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const other = lang === "it" ? "en" : "it";
-  const otherPath = `/${other}${pathname.slice(3)}`;
+  const parts = pathname.split("/").filter(Boolean);
+  const otherPath = counterpart(lang, parts[1], parts[2]);
   return (
     <>
-      <header className="site-header">
+      <header className="site-header" id="top">
         <Link
           to="/$lang"
           params={{ lang }}
@@ -71,9 +73,7 @@ export function Shell({ lang, children }: { lang: Locale; children: React.ReactN
           </Link>
         </nav>
         <div className="header-actions">
-          <a href={otherPath} className="lang">
-            {other.toUpperCase()}
-          </a>
+          {parts[2] ? <Link to="/$lang/$section/$slug" params={{ lang: other, section: otherPath.split("/")[2] ?? "", slug: parts[2] }} className="lang">{other.toUpperCase()}</Link> : parts[1] ? <Link to="/$lang/$section" params={{ lang: other, section: otherPath.split("/")[2] ?? "" }} className="lang">{other.toUpperCase()}</Link> : <Link to="/$lang" params={{ lang: other }} className="lang">{other.toUpperCase()}</Link>}
           <details className="mobile-menu">
             <summary aria-label={lang === "it" ? "Apri menu" : "Open menu"}>☰</summary>
             <div>
@@ -108,30 +108,18 @@ export function Shell({ lang, children }: { lang: Locale; children: React.ReactN
         </div>
       </header>
       <main>{children}</main>
-      <footer>
-        <div>
-          <img src={logo.url} alt="" width="96" height="96" />
-          <h2>
-            ECO TOURS
-            <br />
-            AND SAFARI'S
-          </h2>
+      <section className="footer-invite"><h2>{lang === "it" ? "Pianifichiamo il tuo safari su misura" : "Let’s plan your tailor-made safari"}</h2><a className="button" href={whatsappHref(c, subject || (lang === "it" ? "un safari su misura" : "a tailor-made safari"))} target="_blank" rel="noreferrer">WhatsApp <WhatsAppIcon /></a></section>
+      <footer className="site-footer">
+        <div className="footer-main">
+          <div className="footer-brand"><img src={logo.url} alt="ECO TOURS AND SAFARI'S" width="96" height="96" /><h2>ECO TOURS<br />AND SAFARI'S</h2><p>{c.home.footerText}</p><div className="social-links"><a href="https://instagram.com/africano_di_africa_" aria-label="Instagram @africano_di_africa_" target="_blank" rel="noreferrer"><InstagramIcon /></a><a href={whatsappHref(c, subject || "ECO TOURS AND SAFARI'S")} aria-label="WhatsApp" target="_blank" rel="noreferrer"><WhatsAppIcon /></a></div><small>@africano_di_africa_</small></div>
+          {(["safari", "excursions", "parks"] as const).map((kind, i) => <nav key={kind} aria-label={nav[lang][i]}><h3>{nav[lang][i]}</h3><Link to="/$lang/$section" params={{ lang, section: p[kind] }}>{lang === "it" ? "Tutte le esperienze" : "All experiences"}</Link>{c[kind].slice(0, 3).map(item => <Link key={item.slug} to="/$lang/$section/$slug" params={{ lang, section: p[kind], slug: item.slug }}>{item.title}</Link>)}</nav>)}
+          <nav aria-label={nav[lang][5]}><h3>{nav[lang][5]}</h3><Link to="/$lang/$section" params={{ lang, section: p.contact }}>{nav[lang][5]}</Link><Link to="/$lang/$section" params={{ lang, section: p.about }}>{nav[lang][3]}</Link><Link to="/$lang/$section" params={{ lang, section: p.gallery }}>{nav[lang][4]}</Link><a href={whatsappHref(c, subject || "ECO TOURS AND SAFARI'S")} target="_blank" rel="noreferrer">{phoneLabel(c.whatsapp)}</a></nav>
         </div>
-        <p>
-{c.home.footerText}
-        </p>
-        <div className="footer-links">
-          <a href={`https://instagram.com/africano_di_africa_`} target="_blank" rel="noreferrer">
-            @africano_di_africa_
-          </a>
-          <a href={whatsappHref(c, "un viaggio in Kenya")} target="_blank" rel="noreferrer">
-            {phoneLabel(c.whatsapp)}
-          </a>
-        </div>
+        <div className="footer-bottom"><small>© {new Date().getUTCFullYear()} ECO TOURS AND SAFARI'S</small><nav aria-label={lang === "it" ? "Informazioni legali" : "Legal information"}>{["privacy", "cookie", lang === "it" ? "termini" : "terms"].map(section => <Link key={section} to="/$lang/$section" params={{ lang, section }}>{section === "termini" ? "Termini" : section.charAt(0).toUpperCase() + section.slice(1)}</Link>)}</nav><div className="footer-languages"><Link to="/$lang" params={{ lang: "it" }} aria-current={lang === "it" ? "page" : undefined}>IT</Link><Link to="/$lang" params={{ lang: "en" }} aria-current={lang === "en" ? "page" : undefined}>EN</Link></div><a href="#top" className="back-top">{lang === "it" ? "Torna su" : "Back to top"} ↑</a></div>
       </footer>
       <a
         className="whatsapp-float"
-        href={whatsappHref(c, "un viaggio in Kenya")}
+        href={whatsappHref(c, subject || (lang === "it" ? "un viaggio in Kenya" : "a trip to Kenya"))}
         target="_blank"
         rel="noreferrer"
         aria-label="WhatsApp"
@@ -219,17 +207,18 @@ function Listing({ title, intro, items, lang, kind }: { title: string; intro: st
         {items.map((item) => (
           <article className="card" key={item.slug}>
             <Link to="/$lang/$section/$slug" params={{ lang, section: base, slug: item.slug }}>
-              <img src={images[item.image]} alt={item.title} width="1200" height="800" loading="lazy" />
+              <PackagePhoto item={item} thumb />
               <div className="card-body">
                 <span>{item.duration}</span>
                 <h3>{item.title}</h3>
-                <p>{item.description}</p>
+                <p className="card-description">{item.description}</p>
+                {item.parks.length > 0 && <ul className="park-tags">{item.parks.map(park => <li key={park}>{park}</li>)}</ul>}
                 {kind !== "parks" && <p><small>{priceLabel(lang, item)}</small></p>}
                 <strong>{lang === "it" ? "Scopri l’esperienza" : "Explore the experience"} →</strong>
               </div>
             </Link>
-            {kind !== "parks" && (
-              <a className="card-wa" href={whatsappHref(c, item.title)} target="_blank" rel="noreferrer">
+            {(
+              <a className="card-wa button" href={whatsappHref(c, item.title)} target="_blank" rel="noreferrer">
                 WhatsApp
               </a>
             )}
@@ -276,10 +265,11 @@ export function DetailPage({ lang, kind, slug }: { lang: Locale; kind: Kind; slu
     );
   const hasDays = item.itinerary.length > 0;
   return (
-    <Shell lang={lang}>
-      <PageHero title={item.title} kicker={item.duration} text={item.description} image={images[item.image]} />
+    <Shell lang={lang} subject={item.title}>
+      <section className="page-hero package-hero"><PackagePhoto item={item} /><div className="hero-shade" /><div><p className="eyebrow">{item.duration}</p><h1>{item.title}</h1><p>{item.description}</p></div></section>
       <section className="detail band">
         <article>
+          <section className="brief"><h2>{lang === "it" ? "In breve" : "At a glance"}</h2><dl><div><dt>{kind === "parks" ? (lang === "it" ? "Il parco" : "The park") : (lang === "it" ? "Durata" : "Duration")}</dt><dd>{item.duration}</dd></div>{hasDays && <div><dt>{lang === "it" ? "Notti" : "Nights"}</dt><dd>{Math.max(0, item.itinerary.length - 1)}</dd></div>}{item.itinerary[0] && <div><dt>{lang === "it" ? "Partenza" : "Departure"}</dt><dd>{item.itinerary[0].split(/[.!?]/)[0]}</dd></div>}{item.parks.length > 0 && <div><dt>{lang === "it" ? "Parchi" : "Parks"}</dt><dd>{item.parks.join(" · ")}</dd></div>}{item.lodges.length > 0 && <div><dt>Lodge / camp</dt><dd>{item.lodges.join(" · ")} — {lang === "it" ? "secondo disponibilità" : "subject to availability"}</dd></div>}</dl></section>
           {hasDays ? (
             <>
               <p className="eyebrow">{lang === "it" ? "Itinerario" : "Itinerary"}</p>
@@ -320,7 +310,7 @@ export function DetailPage({ lang, kind, slug }: { lang: Locale; kind: Kind; slu
         </article>
         <aside>
           {item.included.length > 0 && <Info title={lang === "it" ? "Incluso" : "Included"} items={item.included} />}
-          {item.excluded.length > 0 && <Info title={lang === "it" ? "Non incluso" : "Not included"} items={item.excluded} />}
+          {item.excluded.length > 0 && <Info title={lang === "it" ? "Non incluso" : "Not included"} items={item.excluded} excluded />}
           {kind === "safari" && c.bring.length > 0 && <Info title={lang === "it" ? "Cosa portare" : "What to bring"} items={c.bring} />}
           {kind !== "parks" && <p className="lead">{priceLabel(lang, item)}</p>}
           <a className="button wide" href={whatsappHref(c, item.title)} target="_blank" rel="noreferrer">
@@ -328,16 +318,17 @@ export function DetailPage({ lang, kind, slug }: { lang: Locale; kind: Kind; slu
           </a>
         </aside>
       </section>
+      <Listing title={lang === "it" ? "Altre esperienze" : "Related experiences"} intro="" items={c[kind].filter(p => p.slug !== item.slug).slice(0, 3)} lang={lang} kind={kind} />
     </Shell>
   );
 }
-function Info({ title, items }: { title: string; items: string[] }) {
+function Info({ title, items, excluded = false }: { title: string; items: string[]; excluded?: boolean }) {
   return (
     <section className="info">
       <h3>{title}</h3>
       <ul>
         {items.map((x, i) => (
-          <li key={i}>{x}</li>
+          <li key={i}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={excluded ? "M6 6l12 12M18 6L6 18" : "M4 12l5 5L20 6"} /></svg><span>{x}</span></li>
         ))}
       </ul>
     </section>
@@ -415,3 +406,9 @@ function WhatsAppIcon() {
     </svg>
   );
 }
+
+function PackagePhoto({ item, thumb = false }: { item: Pkg; thumb?: boolean }) {
+  if (!item.cover) return <div className={thumb ? "package-placeholder" : "package-placeholder cover-placeholder"} role="img" aria-label={item.title}><svg viewBox="0 0 120 80" aria-hidden="true"><path d="M8 64h104M18 64l34-38 25 38M61 42l14-18 30 40M85 10a7 7 0 1 0 .01 0" /></svg><span>ECO TOURS AND SAFARI'S</span></div>;
+  return <img src={`/api/public/img/${thumb ? item.cover.thumb_path : item.cover.path}`} alt={item.cover.alt} width={thumb ? 480 : 1600} height={thumb ? 300 : 1000} loading={thumb ? "lazy" : "eager"} fetchPriority={thumb ? "auto" : "high"} style={thumb ? undefined : { objectPosition: `${item.cover.focal_x}% ${item.cover.focal_y}%` }} />;
+}
+function InstagramIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".8" /></svg>; }

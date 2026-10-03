@@ -17,3 +17,6 @@
 - Additional admins are created only by an existing admin through a server function using the service-role client, with a one-time temporary password and a must_change_password flag in user metadata that the /admin layout enforces; this keeps each person's access separate without public signup.
 - sitemap.xml, robots.txt and llms.txt are server routes built from live content and the request origin, so they follow published content and work on any domain.
 - Gallery uploads are named by content hash so the image proxy can cache them as immutable.
+- Package covers are stored as validated JSON metadata on packages, with content-hashed private-storage full, thumbnail and social renditions; this keeps existing package records and fallback reads backward compatible.
+- Legal notices share the bilingual section route and read public owner fields from site_content; this keeps notices server-rendered and contact details editable without duplicating routes.
+- Cover crops are generated in the browser from a shared pure crop calculation; this keeps focal-point thumbnails and social images consistent without new dependencies.

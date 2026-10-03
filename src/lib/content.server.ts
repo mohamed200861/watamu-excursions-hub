@@ -1,8 +1,9 @@
 import snapshot from "./content-snapshot.json";
 import en from "./content-en.json";
-import type { HomeText, ImageKey, Locale, PageText, Photo, Pkg, SiteContent } from "./content-types";
+import type { Cover, HomeText, ImageKey, Locale, PageText, Photo, Pkg, SiteContent } from "./content-types";
 
 type Row = {
+  cover?: Cover | null;
   kind: string;
   slug: string;
   title: string;
@@ -69,6 +70,7 @@ const enPk = en.packages as Record<string, { title: string; duration: string; de
 
 function toPkg(r: Row, lang: Locale): Pkg {
   const base: Pkg = {
+    cover: r.cover ?? null,
     slug: r.slug,
     title: r.title,
     duration: r.duration,
@@ -159,6 +161,7 @@ export function buildContent(raw: Raw, lang: Locale): SiteContent {
   }));
   const it = lang === "it";
   return {
+    owner: { name: "", address: "", email: "", phone: "", license: "", ...c["owner"] },
     lang,
     whatsapp,
     template: it ? settings.template || "Ciao Africano! Vorrei informazioni su {pacchetto}." : enTemplate,

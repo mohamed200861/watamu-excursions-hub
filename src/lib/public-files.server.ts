@@ -1,8 +1,8 @@
 import { buildContent, loadRaw } from "./content.server";
 
 const sections = {
-  it: { list: ["safari", "escursioni", "parchi", "chi-siamo", "galleria", "contatti"], safari: "safari", excursions: "escursioni", parks: "parchi" },
-  en: { list: ["safaris", "excursions", "parks", "about", "gallery", "contact"], safari: "safaris", excursions: "excursions", parks: "parks" },
+  it: { list: ["safari", "escursioni", "parchi", "chi-siamo", "galleria", "contatti", "privacy", "cookie", "termini"], safari: "safari", excursions: "escursioni", parks: "parchi" },
+  en: { list: ["safaris", "excursions", "parks", "about", "gallery", "contact", "privacy", "cookie", "terms"], safari: "safaris", excursions: "excursions", parks: "parks" },
 } as const;
 
 export async function sitemapXml(origin: string) {
@@ -30,6 +30,11 @@ export async function llmsTxt(origin: string) {
     `- WhatsApp: https://wa.me/${c.whatsapp}`,
     "- Instagram: https://instagram.com/africano_di_africa_",
     `- Sito in italiano: ${origin}/it — in inglese: ${origin}/en`,
+    "",
+    "## Informazioni legali",
+    `- [Privacy](${origin}/it/privacy) — [English](${origin}/en/privacy)`,
+    `- [Cookie](${origin}/it/cookie) — [English](${origin}/en/cookie)`,
+    `- [Termini](${origin}/it/termini) — [English](${origin}/en/terms)`,
     "",
     "## Safari",
     ...c.safari.map((p) => line("safari", p)),

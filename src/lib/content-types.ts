@@ -2,7 +2,11 @@ export type Locale = "it" | "en";
 export type ImageKey = "safari" | "coast" | "wildlife" | "creek";
 export type Kind = "safari" | "excursions" | "parks";
 
+export type Cover = { path: string; thumb_path: string; og_path: string; alt: string; focal_x: number; focal_y: number };
+export type Owner = { name: string; address: string; email: string; phone: string; license: string };
+
 export type Pkg = {
+  cover?: Cover | null;
   slug: string;
   title: string;
   duration: string;
@@ -45,6 +49,7 @@ export type HomeText = {
 };
 
 export type SiteContent = {
+  owner: Owner;
   lang: Locale;
   whatsapp: string;
   template: string;

@@ -79,6 +79,7 @@ export type Database = {
       }
       packages: {
         Row: {
+          cover: Json | null
           description: string
           duration: string
           excluded: Json
@@ -97,6 +98,7 @@ export type Database = {
           visible: boolean
         }
         Insert: {
+          cover?: Json | null
           description?: string
           duration?: string
           excluded?: Json
@@ -115,6 +117,7 @@ export type Database = {
           visible?: boolean
         }
         Update: {
+          cover?: Json | null
           description?: string
           duration?: string
           excluded?: Json

@@ -37,6 +37,7 @@ const contentSchemas = {
     seaText: str(400),
     footerText: str(300),
   }),
+  owner: z.object({ name: str(200), address: str(400), email: z.union([z.literal(""), z.string().trim().email().max(200)]), phone: str(80), license: str(120) }),
   about: page,
   contact: page,
   gallery: page,
@@ -72,7 +73,11 @@ export const saveContent = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const photoPath = z.string().regex(/^[a-z0-9-]+\/[a-z0-9-]+\.webp$/);
+const coverSchema = z.object({ path: photoPath, thumb_path: photoPath, og_path: photoPath, alt: str(300).min(1), focal_x: z.number().min(0).max(100), focal_y: z.number().min(0).max(100) });
+
 const pkgSchema = z.object({
+  cover: coverSchema.nullable().optional(),
   id: z.string().uuid().optional(),
   kind: z.enum(["safari", "excursion", "park"]),
   slug: z.string().trim().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Indirizzo: solo lettere minuscole, numeri e trattini").max(80),
@@ -130,7 +135,6 @@ export const reorder = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-const photoPath = z.string().regex(/^[a-z0-9-]+\/[a-z0-9-]+\.webp$/);
 export const registerPhoto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
@@ -175,7 +179,12 @@ export const deletePhoto = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const { data: row, error: e1 } = await (context.supabase as any).from("gallery_photos").select("path, thumb_path").eq("id", data.id).single();
     fail(e1, "Foto non trovata");
-    await (context.supabase as any).storage.from("gallery").remove([row.path, row.thumb_path]);
+    const { data: covers, error: coverError } = await (context.supabase as any).from("packages").select("cover");
+    fail(coverError, "Impossibile verificare le copertine");
+    const used = (covers ?? []).some((p: any) => p.cover && [p.cover.path, p.cover.thumb_path, p.cover.og_path].some((path: string) => path === row.path || path === row.thumb_path));
+    if (used) throw new Error("Questa foto è usata come copertina: cambia prima la copertina del pacchetto.");
+    const { error: storageError } = await (context.supabase as any).storage.from("gallery").remove([row.path, row.thumb_path]);
+    fail(storageError, "Eliminazione file non riuscita");
     const { error } = await (context.supabase as any).from("gallery_photos").delete().eq("id", data.id);
     fail(error, "Eliminazione non riuscita");
     await log(context, "photo.delete", { path: row.path });
@@ -236,7 +245,8 @@ export const addAdmin = createServerFn({ method: "POST" })
         user_metadata: { must_change_password: true },
       });
       fail(error, "Impossibile creare l'account");
-      user = created.user!;
+      if (!created.user) throw new Error("Impossibile creare l’account");
+      user = created.user;
     }
     const { error } = await (supabaseAdmin as any).from("user_roles").upsert({ user_id: user.id, role: "admin" }, { onConflict: "user_id,role", ignoreDuplicates: true });
     fail(error, "Impossibile assegnare il ruolo");

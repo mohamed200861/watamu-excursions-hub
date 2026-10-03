@@ -3,6 +3,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { CoverEditor } from "@/components/admin/CoverEditor";
+import type { Cover } from "@/lib/content-types";
 import { deletePackage, reorder, savePackage } from "@/lib/admin.functions";
 import { Area, Card, Field, Lines, Text, btn, btnDanger, btnGhost, input, move, useStatus } from "@/components/admin/ui";
 
@@ -10,6 +12,7 @@ export const Route = createFileRoute("/admin/pacchetti")({ component: PackagesPa
 
 type Kind = "safari" | "excursion" | "park";
 type Pkg = {
+  cover?: Cover | null;
   id?: string;
   kind: Kind;
   slug: string;
@@ -70,8 +73,8 @@ function PackagesPage() {
                 {p.duration} · {p.price || "Chiedi su WhatsApp"} · {p.visible ? "Visibile" : "Nascosto"}
               </p>
             </div>
-            <button className={btnGhost} disabled={busy || i === 0} aria-label="Sposta su" onClick={() => run(async () => { await doReorder({ data: { table: "packages", ids: move(list, i, -1).map((x) => x.id!) } }); await refresh(); }, "Ordine aggiornato")}>↑</button>
-            <button className={btnGhost} disabled={busy || i === list.length - 1} aria-label="Sposta giù" onClick={() => run(async () => { await doReorder({ data: { table: "packages", ids: move(list, i, 1).map((x) => x.id!) } }); await refresh(); }, "Ordine aggiornato")}>↓</button>
+            <button className={btnGhost} disabled={busy || i === 0} aria-label="Sposta su" onClick={() => run(async () => { await doReorder({ data: { table: "packages", ids: move(list, i, -1).flatMap((x) => x.id ? [x.id] : []) } }); await refresh(); }, "Ordine aggiornato")}>↑</button>
+            <button className={btnGhost} disabled={busy || i === list.length - 1} aria-label="Sposta giù" onClick={() => run(async () => { await doReorder({ data: { table: "packages", ids: move(list, i, 1).flatMap((x) => x.id ? [x.id] : []) } }); await refresh(); }, "Ordine aggiornato")}>↓</button>
             <button className={btn} onClick={() => setEditing(p)}>Modifica</button>
           </li>
         ))}
@@ -120,7 +123,8 @@ function Editor({ pkg, onClose }: { pkg: Pkg; onClose: () => void }) {
           <Lines label="Lodge e camp" value={v.lodges} onChange={(x) => set("lodges", x)} />
         </>
       )}
-      <Field label="Foto">
+      <CoverEditor cover={v.cover} onChange={(cover) => set("cover", cover)} />
+      <Field label="Immagine predefinita">
         <select className={input} value={v.image} onChange={(e) => set("image", e.target.value as Pkg["image"])}>
           <option value="safari">Savana al tramonto</option>
           <option value="wildlife">Elefanti</option>
@@ -170,7 +174,7 @@ function Editor({ pkg, onClose }: { pkg: Pkg; onClose: () => void }) {
             disabled={busy}
             onClick={() => {
               if (!confirm(`Eliminare definitivamente “${v.title}”?`)) return;
-              run(async () => { await del({ data: { id: v.id! } }); onClose(); }, "Eliminato");
+              run(async () => { if (!v.id) return; await del({ data: { id: v.id } }); onClose(); }, "Eliminato");
             }}
           >
             Elimina

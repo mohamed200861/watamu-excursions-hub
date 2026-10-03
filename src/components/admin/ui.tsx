@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, type ButtonHTMLAttributes, type ReactNode } from "react";
 
 export const input =
   "w-full rounded-md border border-input bg-background px-3 py-2 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring";
@@ -101,3 +101,5 @@ export function move<T>(arr: T[], i: number, d: number): T[] {
   [next[i], next[j]] = [next[j] as T, next[i] as T];
   return next;
 }
+
+export function Button(props: ButtonHTMLAttributes<HTMLButtonElement>) { return <button type="button" {...props} />; }

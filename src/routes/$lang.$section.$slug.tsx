@@ -10,14 +10,14 @@ export const Route = createFileRoute("/$lang/$section/$slug")({
     const c = await loadContent(getLocale(params.lang));
     const item = c[kind].find((x) => x.slug === params.slug);
     if (!item) throw notFound();
-    return { kind, title: item.title, description: item.description, whatsapp: c.whatsapp };
+    return { kind, title: item.title, description: item.description, whatsapp: c.whatsapp, image: item.cover ? `https://watamu-excursions-hub.lovable.app/api/public/img/${item.cover.og_path}` : undefined };
   },
   staleTime: 60_000,
   head: ({ params, loaderData }) => {
     const l = getLocale(params.lang);
     const path = `/${l}/${params.section}/${params.slug}`;
     if (!loaderData) return headFor(l, l === "it" ? "Esperienza non trovata" : "Experience not found", "ECO TOURS AND SAFARI'S", path);
-    const { kind, title, description, whatsapp } = loaderData;
+    const { kind, title, description, whatsapp, image } = loaderData;
     const primary =
       kind === "safari"
         ? { "@type": "TouristTrip", name: title, description, touristType: "Safari", provider: { "@type": "TravelAgency", name: "ECO TOURS AND SAFARI'S" } }
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/$lang/$section/$slug")({
         },
       ],
     };
-    return headFor(l, title, description, path, schema);
+    return headFor(l, title, description, path, schema, image);
   },
   component: Page,
 });
