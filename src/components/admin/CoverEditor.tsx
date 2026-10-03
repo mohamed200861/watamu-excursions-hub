@@ -5,7 +5,7 @@ import { coverFromBlob } from '@/lib/cover-image';
 import { checkFile } from '@/lib/image-resize';
 import type { Cover } from '@/lib/content-types';
 import { Button, Field, Text, btn, btnGhost, input, useStatus } from './ui';
-export function CoverEditor({ cover, onChange }: { cover?: Cover | null; onChange: (cover: Cover | null) => void }) {
+export function CoverEditor({ cover, onChange }: { cover?: Cover | null | undefined; onChange: (cover: Cover | null) => void }) {
   const [source, setSource] = useState<Blob | null>(null), [preview, setPreview] = useState('');
   const [alt, setAlt] = useState(cover?.alt ?? ''), [x, setX] = useState(cover?.focal_x ?? 50), [y, setY] = useState(cover?.focal_y ?? 50);
   const s = useStatus();
