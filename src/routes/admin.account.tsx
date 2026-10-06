@@ -103,7 +103,7 @@ function Admins() {
         ))}
       </ul>
       <form onSubmit={submit} className="space-y-4">
-        <Field label="Aggiungi amministratore (email)" hint="Riceverà una password temporanea da cambiare al primo accesso.">
+        <Field label="Aggiungi amministratore (email)" hint="L'account deve già esistere (creato in Cloud → Users con password temporanea): al primo accesso gli verrà chiesto di cambiarla.">
           <input className={input} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
         {view}
