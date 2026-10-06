@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { saveContent } from "@/lib/admin.functions";
+import { CoverEditor } from "@/components/admin/CoverEditor";
 import { Area, Card, Lines, Text, btn, btnDanger, btnGhost, move, useStatus } from "@/components/admin/ui";
 
 export const Route = createFileRoute("/admin/")({ component: TextsPage });
@@ -31,7 +32,8 @@ function TextsPage() {
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">Le modifiche compaiono sul sito in italiano entro circa un minuto.</p>
       <Block keyName="home" title="Home" initial={c["home"] ?? {}} render={(v, set) => <HomeForm v={v} set={set} />} />
-      {(["about", "contact", "gallery"] as const).map((k) => (
+      <Block keyName="about" title="Chi siamo" initial={c["about"] ?? { title: "", subtitle: "", text: "" }} render={(v, set) => <AboutForm v={v} set={set} />} />
+      {(["contact", "gallery"] as const).map((k) => (
         <Block
           key={k}
           keyName={k}
@@ -125,3 +127,45 @@ function FaqForm({ v, set }: { v: Any; set: (v: Any) => void }) {
   );
 }
 
+
+function AboutForm({ v, set }: { v: Any; set: (v: Any) => void }) {
+  const f = (k: string) => ({ value: v[k] ?? "", onChange: (x: string) => set({ ...v, [k]: x }) });
+  const photos: Any[] = v.photos ?? [];
+  const lic = { text: "", number: "", expires: "", ...(v.license ?? {}) };
+  const setLic = (k: string, x: string) => set({ ...v, license: { ...lic, [k]: x } });
+  return (
+    <>
+      <Text label="Titolo" {...f("title")} />
+      <Text label="Sottotitolo" {...f("subtitle")} />
+      <Area label="Testo introduttivo" rows={4} {...f("text")} />
+      <Text label="Titolo sezione “Chi sono”" {...f("meTitle")} />
+      <Area label="Testo “Chi sono” (riga vuota = nuovo paragrafo)" rows={10} {...f("me")} />
+      <div className="space-y-3 rounded-md border border-border p-3">
+        <h3 className="text-lg">Foto (da 1 a 3)</h3>
+        {photos.map((ph, i) => (
+          <div key={ph.path + i} className="space-y-2">
+            <p className="text-sm text-muted-foreground">Foto {i + 1}{i === 0 ? " (grande, in evidenza)" : ""}</p>
+            <CoverEditor cover={ph} onChange={(x) => set({ ...v, photos: x ? photos.map((o, j) => (j === i ? x : o)) : photos.filter((_, j) => j !== i) })} />
+            <div className="flex flex-wrap gap-2">
+              <button className={btnGhost} disabled={i === 0} onClick={() => set({ ...v, photos: move(photos, i, -1) })}>Su</button>
+              <button className={btnGhost} disabled={i === photos.length - 1} onClick={() => set({ ...v, photos: move(photos, i, 1) })}>Giù</button>
+            </div>
+          </div>
+        ))}
+        {photos.length < 3 && <NewAboutPhoto onAdd={(x) => set({ ...v, photos: [...photos, x] })} />}
+        <p className="text-sm text-muted-foreground">Dopo “Prepara copertina” premi “Salva chi siamo”.</p>
+      </div>
+      <div className="space-y-2 rounded-md border border-border p-3">
+        <h3 className="text-lg">Licenza guida (facoltativa)</h3>
+        <p className="text-sm text-muted-foreground">Il riquadro compare in Chi siamo solo se il testo è compilato e la scadenza non è passata. Esempio: Guida con licenza TRA (Tourism Regulatory Authority, Kenya), classe E</p>
+        <Text label="Testo" value={lic.text} onChange={(x) => setLic("text", x)} />
+        <Text label="Numero (mostrato solo se compilato)" value={lic.number} onChange={(x) => setLic("number", x)} />
+        <label className="block space-y-1 text-sm"><span>Scadenza</span><input type="date" className="w-full rounded-md border border-border bg-background px-3 py-2" value={lic.expires} onChange={(e) => setLic("expires", e.target.value)} /></label>
+      </div>
+    </>
+  );
+}
+function NewAboutPhoto({ onAdd }: { onAdd: (c: Any) => void }) {
+  const [k, setK] = useState(0);
+  return <CoverEditor key={k} cover={null} onChange={(x) => { if (x) { onAdd(x); setK(k + 1); } }} />;
+}
