@@ -336,3 +336,12 @@ footer.site-footer { display: block; padding-bottom: 6rem; }
   .legal-page h1 { font-size: 2.5rem; }
   .legal-page dl > div { grid-template-columns: 1fr; gap: .2rem; }
 }
+
+.about-me { display: grid; gap: 1.75rem; margin: 2.5rem 0; text-align: left; }
+.about-photos { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; }
+.about-photos img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 1rem; }
+.about-photos img:first-child { grid-column: 1 / -1; aspect-ratio: 4 / 3; }
+.about-text p { margin: 0 0 1rem; line-height: 1.7; }
+.license-badge { display: inline-flex; align-items: center; gap: .5rem; padding: .45rem .85rem; border: 1px solid var(--border); border-radius: 999px; font-size: .875rem; color: var(--foreground); }
+.license-badge svg { width: 1.1rem; height: 1.1rem; fill: var(--primary); flex: none; }
+@media (min-width: 860px) { .about-me:not(.no-photo) { grid-template-columns: 1.1fr 1fr; align-items: start; gap: 3rem; } }
