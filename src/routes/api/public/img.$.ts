@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { missingMessage, readSupabaseConfig } from "@/lib/supabase-config";
 
 // Serves published gallery/cover photos from private storage with long-lived CDN caching.
 // Uses only the public key, so it works on any host (Lovable or Cloudflare) with just
@@ -9,9 +10,12 @@ export const Route = createFileRoute("/api/public/img/$")({
       GET: async ({ params }) => {
         const path = params._splat ?? "";
         if (!/^[a-z0-9-]+\/[a-z0-9-]+\.webp$/.test(path)) return new Response("Not found", { status: 404 });
-        const url = process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] || import.meta.env["VITE_SUPABASE_URL"];
-        const key = process.env["SUPABASE_PUBLISHABLE_KEY"] || process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
-        if (!url || !key) return new Response("Unavailable", { status: 503 });
+        const { config, missing } = readSupabaseConfig();
+        if (!config) {
+          console.error(`[img] ${missingMessage(missing)}`);
+          return new Response("Unavailable", { status: 503 });
+        }
+        const { url, key } = config;
         try {
           const headers: Record<string, string> = { apikey: key };
           if (!key.startsWith("sb_")) headers["Authorization"] = `Bearer ${key}`;

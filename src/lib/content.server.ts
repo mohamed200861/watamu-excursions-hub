@@ -1,3 +1,4 @@
+import { requireSupabaseConfig } from "./supabase-config";
 import snapshot from "./content-snapshot.json";
 import en from "./content-en.json";
 import type { AboutText, Cover, HomeText, ImageKey, Locale, PageText, Photo, Pkg, SiteContent } from "./content-types";
@@ -34,9 +35,7 @@ export type Raw = { content: Record<string, any>; packages: Row[]; photos: Photo
 let lastGood: Raw | null = null;
 
 async function fetchRaw(): Promise<Raw> {
-  const url = process.env["SUPABASE_URL"];
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-  if (!url || !key) throw new Error("Backend non configurato");
+  const { url, key } = requireSupabaseConfig();
   const headers: Record<string, string> = { apikey: key };
   if (!key.startsWith("sb_")) headers["Authorization"] = `Bearer ${key}`;
   const signal = AbortSignal.timeout(2500);
