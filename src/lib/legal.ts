@@ -41,10 +41,10 @@ export function legalSections(kind: LegalKind, lang: Locale, owner?: Partial<Own
   ];
 }
 export function ownerEntries(owner: Owner, lang: Locale): [string, string][] {
-  const labels = lang === 'it' ? ['Nome o ragione sociale', 'Indirizzo', 'Email', 'Telefono', 'Licenza operatore turistico'] : ['Name or company', 'Address', 'Email', 'Phone', 'Tour operator licence'];
-  return ([owner.name, owner.address, owner.email, owner.phone, owner.license]).map((value, i) => [labels[i] ?? '', value?.trim() ?? ''] as [string, string]).filter(([, v]) => v !== '');
+  const labels = lang === 'it' ? ['Nome o ragione sociale', 'Indirizzo', 'Email', 'Telefono'] : ['Name or company', 'Address', 'Email', 'Phone'];
+  return ([owner.name, owner.address, owner.email, owner.phone]).map((value, i) => [labels[i] ?? '', value?.trim() ?? ''] as [string, string]).filter(([, v]) => v !== '');
 }
-/** Legal pages stay noindex until every required controller field is filled in from /admin (licence is optional). */
+/** Legal pages stay noindex until controller name, a contact (email or phone), retention, transfers and law are filled in; address is optional and hidden when empty. */
 export function legalComplete(owner: Partial<Owner>): boolean {
-  return (['name', 'address', 'email', 'phone', 'retention', 'transfers', 'law'] as const).every((k) => (owner[k] ?? '').trim() !== '');
+  return ((owner.email ?? '').trim() !== '' || (owner.phone ?? '').trim() !== '') && (['name', 'retention', 'transfers', 'law'] as const).every((k) => (owner[k] ?? '').trim() !== '');
 }

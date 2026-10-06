@@ -22,6 +22,10 @@ const str = (max = 400) => z.string().trim().max(max);
 const list = (max = 30, len = 600) => z.array(str(len)).max(max);
 const page = z.object({ title: str(120).min(1), subtitle: str(300), text: str(3000) });
 
+function coverSchemaAbout() {
+  const p = z.string().regex(/^[a-z0-9-]+\/[a-z0-9-]+\.webp$/);
+  return z.object({ path: p, thumb_path: p, og_path: p, alt: str(300).min(1), focal_x: z.number().min(0).max(100), focal_y: z.number().min(0).max(100) });
+}
 const contentSchemas = {
   home: z.object({
     heroEyebrow: str(120),
@@ -38,7 +42,12 @@ const contentSchemas = {
     footerText: str(300),
   }),
   owner: z.object({ name: str(200), address: str(400), email: z.union([z.literal(""), z.string().trim().email().max(200)]), phone: str(80), license: str(120), retention: str(1000).default(""), transfers: str(1000).default(""), law: str(1000).default("") }),
-  about: page,
+  about: page.extend({
+    meTitle: str(120).default(""),
+    me: str(4000).default(""),
+    photos: z.array(coverSchemaAbout()).max(3).default([]),
+    license: z.object({ text: str(200), number: str(80), expires: z.union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Scadenza: usa una data valida")]) }).default({ text: "", number: "", expires: "" }),
+  }),
   contact: page,
   gallery: page,
   faq: z.object({ items: z.array(z.object({ q: str(200).min(1), a: str(1500).min(1) })).max(30) }),
