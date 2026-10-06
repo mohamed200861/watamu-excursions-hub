@@ -32,6 +32,16 @@ export type Photo = {
 };
 
 export type PageText = { title: string; subtitle: string; text: string };
+export type GuideLicense = { text: string; number: string; expires: string };
+export type AboutText = PageText & { meTitle?: string; me?: string; photos?: Cover[]; license?: GuideLicense };
+
+/** Guide licence badge shows only when its text is filled and the expiry date (YYYY-MM-DD) has not passed. */
+export function licenseActive(l: Partial<GuideLicense> | undefined, today: Date = new Date()): boolean {
+  if (!l || !(l.text ?? "").trim()) return false;
+  const exp = (l.expires ?? "").trim();
+  if (!exp) return true;
+  return exp >= today.toISOString().slice(0, 10);
+}
 
 export type HomeText = {
   heroEyebrow: string;
@@ -54,7 +64,7 @@ export type SiteContent = {
   whatsapp: string;
   template: string;
   home: HomeText;
-  about: PageText;
+  about: AboutText;
   contact: PageText;
   gallery: PageText;
   faq: { q: string; a: string }[];

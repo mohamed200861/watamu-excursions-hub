@@ -43,6 +43,13 @@
       "when": 1791062876364,
       "tag": "0005_home_why_six",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791269039909,
+      "tag": "0006_about_photos_itinerary_owner",
+      "breakpoints": true
     }
   ]
 }

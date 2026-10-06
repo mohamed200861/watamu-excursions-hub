@@ -6,7 +6,7 @@ import wildlife from "@/assets/kenya-wildlife.webp";
 import creek from "@/assets/mida-creek.webp";
 import { counterpart } from "@/lib/seo";
 import { useContent } from "@/lib/content-client";
-import { phoneLabel, whatsappHref, type Kind, type Locale, type Pkg, type Photo } from "@/lib/content-types";
+import { licenseActive, phoneLabel, whatsappHref, type AboutText, type Kind, type Locale, type Pkg, type Photo } from "@/lib/content-types";
 import { useEffect, useState } from "react";
 const nav = {
   it: ["Safari", "Escursioni", "Parchi", "Chi siamo", "Galleria", "Contatti"],
@@ -343,6 +343,7 @@ export function SimplePage({ lang, type }: { lang: Locale; type: "about" | "gall
       <PageHero title={t.title} text={t.subtitle} image={type === "gallery" ? creek : type === "about" ? wildlife : coast} />
       <section className="simple band">
         <p className="lead">{t.text}</p>
+        {type === "about" && <AboutMe a={c.about} lang={lang} />}
         {type === "gallery" ? (
           <Gallery lang={lang} photos={c.photos.length > 0 ? c.photos : [
             { id: "t1", src: safariHero, thumb: safariHero, width: 1600, height: 1000, caption: "Safari", alt: "Kenyan safari", category: "safari" },
@@ -357,6 +358,28 @@ export function SimplePage({ lang, type }: { lang: Locale; type: "about" | "gall
         )}
       </section>
     </Shell>
+  );
+}
+function AboutMe({ a, lang }: { a: AboutText; lang: Locale }) {
+  const photos = a.photos ?? [];
+  const lic = a.license;
+  const showLic = licenseActive(lic);
+  if (!a.me && photos.length === 0 && !showLic) return null;
+  return (
+    <section className={photos.length ? "about-me" : "about-me no-photo"} aria-labelledby="about-me-title">
+      {photos.length > 0 && (
+        <div className="about-photos">
+          {photos.map((ph, i) => (
+            <img key={ph.path} src={`/api/public/img/${i === 0 ? ph.path : ph.thumb_path}`} alt={ph.alt} width={i === 0 ? 1600 : 480} height={i === 0 ? 1000 : 300} loading={i === 0 ? "eager" : "lazy"} fetchPriority={i === 0 ? "high" : "auto"} decoding="async" style={{ objectPosition: `${ph.focal_x}% ${ph.focal_y}%` }} />
+          ))}
+        </div>
+      )}
+      <div className="about-text">
+        <h2 id="about-me-title">{a.meTitle || (lang === "it" ? "Chi sono" : "About me")}</h2>
+        {(a.me ?? "").split(/\n\s*\n/).filter(Boolean).map((para, i) => <p key={i}>{para}</p>)}
+        {showLic && lic && <p className="license-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6l8-4zm-1 13l6-6-1.4-1.4L11 12.2 8.4 9.6 7 11l4 4z" /></svg><span>{lic.text}{lic.number ? ` · n. ${lic.number}` : ""}</span></p>}
+      </div>
+    </section>
   );
 }
 function Gallery({ photos, lang }: { photos: Photo[]; lang: Locale }) {

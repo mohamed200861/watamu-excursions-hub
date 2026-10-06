@@ -22,3 +22,4 @@
 - Package covers are stored as validated JSON metadata on packages, with content-hashed private-storage full, thumbnail and social renditions; this keeps existing package records and fallback reads backward compatible.
 - Legal notices share the bilingual section route and read public owner fields from site_content; this keeps notices server-rendered and contact details editable without duplicating routes.
 - Cover crops are generated in the browser from a shared pure crop calculation; this keeps focal-point thumbnails and social images consistent without new dependencies.
+- About-page photos and the optional guide licence live inside the 'about' site_content row (photos reuse the cover pipeline and is_published_file allows them); the licence badge is shown only via licenseActive() and never enters JSON-LD.

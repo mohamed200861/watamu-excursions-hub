@@ -22,7 +22,7 @@ export function legalSections(kind: LegalKind, lang: Locale, owner?: Partial<Own
     ['Itineraries and quotations', 'Itineraries, times, lodges and activities are indicative and subject to availability. Travel conditions, price, payments, cancellations and refunds are set out in the individual quotation agreed via WhatsApp. Browsing this site alone does not confirm a booking.'],
     ['Inclusions and insurance', 'Included and excluded services are those listed in the package and the accepted quotation. Safari insurance is provided as stated in the inclusions; coverage, limits and exclusions must be checked in the quotation and policy terms.'],
     ['Responsibility', 'The organiser is responsible within the applicable law and accepted agreements, without excluding mandatory traveller rights. Changes caused by availability, local conditions or events beyond control are communicated and handled under the quotation and law. Travellers are responsible for their documents and following their guide’s instructions.'],
-    ...(o('law') ? [['Applicable law', o('law')] as [string, string]] : [])
+    ...(o('law') ? [['Applicable law', /^legge del kenya/i.test(o('law')) ? 'Kenyan law, without prejudice to mandatory consumer protections.' : o('law')] as [string, string]] : [])
   ];
   return it ? [
     ['Dati e finalità', 'Non ci sono moduli di contatto sul sito. Il servizio di hosting può trattare dati tecnici di navigazione e log (ad esempio indirizzo IP, data, pagina richiesta e informazioni del browser) per erogare e proteggere il sito. Nell’area riservata sono usati soltanto strumenti tecnici necessari all’accesso.'],
@@ -41,10 +41,10 @@ export function legalSections(kind: LegalKind, lang: Locale, owner?: Partial<Own
   ];
 }
 export function ownerEntries(owner: Owner, lang: Locale): [string, string][] {
-  const labels = lang === 'it' ? ['Nome o ragione sociale', 'Indirizzo', 'Email', 'Telefono', 'Licenza operatore turistico'] : ['Name or company', 'Address', 'Email', 'Phone', 'Tour operator licence'];
-  return ([owner.name, owner.address, owner.email, owner.phone, owner.license]).map((value, i) => [labels[i] ?? '', value?.trim() ?? ''] as [string, string]).filter(([, v]) => v !== '');
+  const labels = lang === 'it' ? ['Nome o ragione sociale', 'Indirizzo', 'Email', 'Telefono'] : ['Name or company', 'Address', 'Email', 'Phone'];
+  return ([owner.name, owner.address, owner.email, owner.phone]).map((value, i) => [labels[i] ?? '', value?.trim() ?? ''] as [string, string]).filter(([, v]) => v !== '');
 }
-/** Legal pages stay noindex until every required controller field is filled in from /admin (licence is optional). */
+/** Legal pages stay noindex until controller name, a contact (email or phone), retention, transfers and law are filled in; address is optional and hidden when empty. */
 export function legalComplete(owner: Partial<Owner>): boolean {
-  return (['name', 'address', 'email', 'phone', 'retention', 'transfers', 'law'] as const).every((k) => (owner[k] ?? '').trim() !== '');
+  return ((owner.email ?? '').trim() !== '' || (owner.phone ?? '').trim() !== '') && (['name', 'retention', 'transfers', 'law'] as const).every((k) => (owner[k] ?? '').trim() !== '');
 }

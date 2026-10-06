@@ -1,6 +1,6 @@
 import snapshot from "./content-snapshot.json";
 import en from "./content-en.json";
-import type { Cover, HomeText, ImageKey, Locale, PageText, Photo, Pkg, SiteContent } from "./content-types";
+import type { AboutText, Cover, HomeText, ImageKey, Locale, PageText, Photo, Pkg, SiteContent } from "./content-types";
 
 type Row = {
   cover?: Cover | null;
@@ -144,6 +144,14 @@ const enFaq = [
   { q: "Are lodges guaranteed?", a: "The listed properties are assigned subject to availability." },
   { q: "What can I do at night in Taita Hills?", a: "An optional paid night safari with a ranger is available." },
 ];
+const enMe = "My name is Africano and I work with ECO TOURS AND SAFARI'S on the coast of Watamu and Malindi. I have four years of experience and, before this adventure, I worked with two other companies: there I learned how much organisation and details matter, from departure times to game drives at the best moments of the day.\n\nEvery safari and every excursion can be tailored to your needs: we decide the length, parks and stops together on WhatsApp. We will do everything to make your holiday unforgettable, between the savanna and the sea of Kenya.\n\nI look forward to meeting you. Welcome!";
+function aboutFor(a: AboutText | undefined, it: boolean): AboutText {
+  const base = a ?? { title: "", subtitle: "", text: "" };
+  const photos = Array.isArray(base.photos) ? base.photos.filter((p) => p && p.path) : [];
+  if (it) return { ...base, photos };
+  const lic = base.license && base.license.text.trim() ? { ...base.license, text: "Licensed guide, Kenya Tourism Regulatory Authority (TRA), Class E" } : base.license;
+  return { ...enPages.about, meTitle: "About me", me: base.me ? enMe : "", photos, license: lic ?? { text: "", number: "", expires: "" } };
+}
 const enTemplate = "Hello Africano! I would like information about {pacchetto}. People: {persone}. Dates: {date}.";
 
 export function buildContent(raw: Raw, lang: Locale): SiteContent {
@@ -169,7 +177,7 @@ export function buildContent(raw: Raw, lang: Locale): SiteContent {
     whatsapp,
     template: it ? settings.template || "Ciao Africano! Vorrei informazioni su {pacchetto}." : enTemplate,
     home: it ? (c["home"] as HomeText) : enHome,
-    about: it ? (c["about"] as PageText) : enPages.about,
+    about: aboutFor(c["about"] as AboutText | undefined, it),
     contact: it ? (c["contact"] as PageText) : enPages.contact,
     gallery: it ? (c["gallery"] as PageText) : enPages.gallery,
     faq: it ? ((c["faq"]?.items ?? []) as { q: string; a: string }[]) : enFaq,
