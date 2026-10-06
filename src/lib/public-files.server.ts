@@ -32,7 +32,7 @@ export async function llmsTxt(origin: string) {
     `- Sito in italiano: ${origin}/it — in inglese: ${origin}/en`,
     "",
     "## Chi siamo",
-    `- [Chi siamo](${SITE_URL}/it/chi-siamo) — [English](${SITE_URL}/en/about): Africano, guida a Watamu e Malindi con quattro anni di esperienza; safari ed escursioni adattati su WhatsApp.`,
+    `- [Chi siamo](${origin}/it/chi-siamo) — [English](${origin}/en/about): Africano, guida a Watamu e Malindi con quattro anni di esperienza; safari ed escursioni adattati su WhatsApp.`,
     "",
     "## Informazioni legali",
     `- [Privacy](${origin}/it/privacy) — [English](${origin}/en/privacy)`,
