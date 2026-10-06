@@ -150,7 +150,7 @@ function aboutFor(a: AboutText | undefined, it: boolean): AboutText {
   const photos = Array.isArray(base.photos) ? base.photos.filter((p) => p && p.path) : [];
   if (it) return { ...base, photos };
   const lic = base.license && base.license.text.trim() ? { ...base.license, text: "Licensed guide, Kenya Tourism Regulatory Authority (TRA), Class E" } : base.license;
-  return { ...enPages.about, meTitle: "About me", me: base.me ? enMe : "", photos, license: lic };
+  return { ...enPages.about, meTitle: "About me", me: base.me ? enMe : "", photos, license: lic ?? { text: "", number: "", expires: "" } };
 }
 const enTemplate = "Hello Africano! I would like information about {pacchetto}. People: {persone}. Dates: {date}.";
 
