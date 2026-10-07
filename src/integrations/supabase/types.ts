@@ -45,6 +45,7 @@ export type Database = {
           category: string
           created_at: string
           height: number
+          hidden: boolean
           id: string
           path: string
           sort: number
@@ -57,6 +58,7 @@ export type Database = {
           category?: string
           created_at?: string
           height: number
+          hidden?: boolean
           id?: string
           path: string
           sort?: number
@@ -69,6 +71,7 @@ export type Database = {
           category?: string
           created_at?: string
           height?: number
+          hidden?: boolean
           id?: string
           path?: string
           sort?: number

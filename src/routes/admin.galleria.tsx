@@ -9,7 +9,7 @@ import { Card, Field, Text, btn, btnDanger, btnGhost, errorText, input, move, us
 
 export const Route = createFileRoute("/admin/galleria")({ component: GalleryPage });
 
-type Photo = { id: string; path: string; thumb_path: string; caption: string; alt: string; category: "safari" | "mare" | "persone"; sort: number };
+type Photo = { id: string; path: string; thumb_path: string; caption: string; alt: string; category: "safari" | "mare" | "persone"; sort: number; hidden: boolean };
 const cats = [
   { v: "safari", l: "Safari" },
   { v: "mare", l: "Mare" },
@@ -132,7 +132,8 @@ function PhotoRow({ p, index, total, first, last, busy, onMove, onSetPosition, o
           {Array.from({ length: total }, (_, n) => <option key={n} value={n}>N° {n + 1}</option>)}
         </select>
       </Field>
-      <img src={`/api/public/img/${p.thumb_path}`} alt={p.alt} className="h-40 w-full rounded-md object-cover" loading="lazy" />
+      {p.hidden && <p className="text-sm font-semibold text-destructive">Nascosta: non compare nella galleria pubblica</p>}
+      <img src={`/api/public/img/${p.thumb_path}`} alt={p.alt} className={`h-40 w-full rounded-md object-cover ${p.hidden ? "opacity-40" : ""}`} loading="lazy" />
       <Text label="Didascalia" value={v.caption} onChange={(x) => setV({ ...v, caption: x })} />
       <Text label="Testo alternativo" hint="Descrivi la foto per chi non può vederla" value={v.alt} onChange={(x) => setV({ ...v, alt: x })} />
       <Field label="Categoria">
@@ -143,6 +144,7 @@ function PhotoRow({ p, index, total, first, last, busy, onMove, onSetPosition, o
       {s.view}
       <div className="flex flex-wrap gap-2">
         <button className={btn} disabled={s.busy} onClick={() => s.run(() => save({ data: { id: p.id, caption: v.caption, alt: v.alt, category: v.category } }))}>Salva</button>
+        <button className={btnGhost} disabled={s.busy} onClick={() => s.run(async () => { await save({ data: { id: p.id, hidden: !p.hidden } }); onChanged(); }, p.hidden ? "Foto di nuovo visibile" : "Foto nascosta")}>{p.hidden ? "Mostra" : "Nascondi"}</button>
         <button className={btnGhost} disabled={busy || first} aria-label="Sposta su" onClick={() => onMove(-1)}>↑</button>
         <button className={btnGhost} disabled={busy || last} aria-label="Sposta giù" onClick={() => onMove(1)}>↓</button>
         <button
