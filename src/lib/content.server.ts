@@ -47,7 +47,7 @@ async function fetchRaw(): Promise<Raw> {
   const [content, packages, photos] = await Promise.all([
     get("site_content?select=key,data"),
     get("packages?select=*&visible=eq.true&order=sort.asc"),
-    get("gallery_photos?select=*&order=sort.asc"),
+    get("gallery_photos?select=*&hidden=eq.false&order=sort.asc"),
   ]);
   const map = Object.fromEntries((content as { key: string; data: unknown }[]).map((r) => [r.key, r.data]));
   if (!map["home"]) throw new Error("Contenuti mancanti");

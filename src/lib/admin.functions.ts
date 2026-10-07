@@ -164,7 +164,7 @@ export const registerPhoto = createServerFn({ method: "POST" })
 export const updatePhoto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({ id: z.string().uuid(), caption: str(300), alt: str(300), category: z.enum(["safari", "mare", "persone"]) }).parse(d),
+    z.object({ id: z.string().uuid(), caption: str(300).optional(), alt: str(300).optional(), category: z.enum(["safari", "mare", "persone"]).optional(), hidden: z.boolean().optional() }).parse(d),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
