@@ -57,6 +57,13 @@
       "when": 1791402621508,
       "tag": "0007_reorder_items",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791403136191,
+      "tag": "0008_gallery_hidden",
+      "breakpoints": true
     }
   ]
 }
