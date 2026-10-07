@@ -50,6 +50,13 @@
       "when": 1791269039909,
       "tag": "0006_about_photos_itinerary_owner",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791402621508,
+      "tag": "0007_reorder_items",
+      "breakpoints": true
     }
   ]
 }
