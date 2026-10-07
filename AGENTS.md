@@ -24,3 +24,4 @@
 - About-page photos and the optional guide licence live inside the 'about' site_content row (photos reuse the cover pipeline and is_published_file allows them); the licence badge is shown only via licenseActive() and never enters JSON-LD.
 
 - The app never uses the service-role key: admin actions run with the signed-in admin's token (src/lib/admin-auth.ts) and admin management goes through has_role-guarded security-definer SQL functions; public backend URL/key are read only via src/lib/supabase-config.ts, so Cloudflare deploys need public variables only.
+- Lockfile must stay compatible with the Bun version in .bun-version (Cloudflare Workers Builds): after any dependency change regenerate bun.lock with that Bun version and confirm `bun install --frozen-lockfile` passes; Cloudflare runs a frozen install.
