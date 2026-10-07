@@ -128,13 +128,11 @@ export const reorder = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => reorderSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const results = await Promise.all(
-      data.ids.map((id, i) => (context.supabase as any).from(data.table).update({ sort: i + 1 }).eq("id", id)),
-    );
-    const bad = results.find((r: any) => r.error);
-    if (bad) {
-      console.error("reorder failed", bad.error);
-      throw new Error("Riordino non riuscito: " + (bad.error.message ?? "errore sconosciuto"));
+    // One RPC call: avoids the Worker subrequest limit with many photos.
+    const { error } = await (context.supabase as any).rpc("reorder_items", { _table: data.table, _ids: data.ids });
+    if (error) {
+      console.error("reorder failed", error);
+      throw new Error("Riordino non riuscito: " + (error.message ?? "errore sconosciuto"));
     }
     return { ok: true };
   });

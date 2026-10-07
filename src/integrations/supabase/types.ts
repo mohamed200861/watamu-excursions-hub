@@ -194,6 +194,10 @@ export type Database = {
           id: string
         }[]
       }
+      reorder_items: {
+        Args: { _ids: string[]; _table: string }
+        Returns: undefined
+      }
       revoke_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
