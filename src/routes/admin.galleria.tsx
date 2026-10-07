@@ -100,10 +100,18 @@ function GalleryPage() {
           <PhotoRow
             key={p.id}
             p={p}
+            index={i}
+            total={photos.length}
             first={i === 0}
             last={i === photos.length - 1}
             busy={busy}
             onMove={(d) => run(async () => { await doReorder({ data: { table: "gallery_photos", ids: move(photos, i, d).map((x) => x.id) } }); await refresh(); }, "Ordine aggiornato")}
+            onSetPosition={(to) => run(async () => {
+              const next = [...photos];
+              [next[i], next[to]] = [next[to] as Photo, next[i] as Photo];
+              await doReorder({ data: { table: "gallery_photos", ids: next.map((x) => x.id) } });
+              await refresh();
+            }, `Foto spostata al n° ${to + 1}`)}
             onChanged={refresh}
           />
         ))}

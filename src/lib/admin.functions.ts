@@ -128,9 +128,13 @@ export const reorder = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => reorderSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    for (const [i, id] of data.ids.entries()) {
-      const { error } = await (context.supabase as any).from(data.table).update({ sort: i }).eq("id", id);
-      fail(error, "Riordino non riuscito");
+    const results = await Promise.all(
+      data.ids.map((id, i) => (context.supabase as any).from(data.table).update({ sort: i + 1 }).eq("id", id)),
+    );
+    const bad = results.find((r: any) => r.error);
+    if (bad) {
+      console.error("reorder failed", bad.error);
+      throw new Error("Riordino non riuscito: " + (bad.error.message ?? "errore sconosciuto"));
     }
     return { ok: true };
   });
