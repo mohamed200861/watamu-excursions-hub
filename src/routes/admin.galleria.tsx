@@ -100,10 +100,18 @@ function GalleryPage() {
           <PhotoRow
             key={p.id}
             p={p}
+            index={i}
+            total={photos.length}
             first={i === 0}
             last={i === photos.length - 1}
             busy={busy}
             onMove={(d) => run(async () => { await doReorder({ data: { table: "gallery_photos", ids: move(photos, i, d).map((x) => x.id) } }); await refresh(); }, "Ordine aggiornato")}
+            onSetPosition={(to) => run(async () => {
+              const next = [...photos];
+              [next[i], next[to]] = [next[to] as Photo, next[i] as Photo];
+              await doReorder({ data: { table: "gallery_photos", ids: next.map((x) => x.id) } });
+              await refresh();
+            }, `Foto spostata al n° ${to + 1}`)}
             onChanged={refresh}
           />
         ))}
@@ -112,13 +120,18 @@ function GalleryPage() {
   );
 }
 
-function PhotoRow({ p, first, last, busy, onMove, onChanged }: { p: Photo; first: boolean; last: boolean; busy: boolean; onMove: (d: number) => void; onChanged: () => void }) {
+function PhotoRow({ p, index, total, first, last, busy, onMove, onSetPosition, onChanged }: { p: Photo; index: number; total: number; first: boolean; last: boolean; busy: boolean; onMove: (d: number) => void; onSetPosition: (to: number) => void; onChanged: () => void }) {
   const [v, setV] = useState(p);
   const save = useServerFn(updatePhoto);
   const del = useServerFn(deletePhoto);
   const s = useStatus();
   return (
     <li className="space-y-3 rounded-lg border border-border bg-card p-3">
+      <Field label="Numero (posizione)" hint="Scegli un numero: la foto si scambia con quella che ha quel numero.">
+        <select className={input} disabled={busy} value={index} onChange={(e) => { const to = Number(e.target.value); if (to !== index) onSetPosition(to); }}>
+          {Array.from({ length: total }, (_, n) => <option key={n} value={n}>N° {n + 1}</option>)}
+        </select>
+      </Field>
       <img src={`/api/public/img/${p.thumb_path}`} alt={p.alt} className="h-40 w-full rounded-md object-cover" loading="lazy" />
       <Text label="Didascalia" value={v.caption} onChange={(x) => setV({ ...v, caption: x })} />
       <Text label="Testo alternativo" hint="Descrivi la foto per chi non può vederla" value={v.alt} onChange={(x) => setV({ ...v, alt: x })} />
