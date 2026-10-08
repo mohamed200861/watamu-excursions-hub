@@ -210,7 +210,11 @@
 .faq { max-width: 58rem; }
 .faq details { border-top: 1px solid var(--border); padding: 1.2rem 0; }
 .faq summary { font-family: var(--font-display); font-size: 1.3rem; cursor: pointer; display: flex; justify-content: space-between; }
-.faq details p { color: var(--muted-foreground); line-height: 1.7; }
+.faq details p, .faq-list { color: var(--muted-foreground); line-height: 1.7; }
+.faq-list { margin: .6rem 0 0; padding-left: 1.2rem; list-style: disc; }
+.gallery-empty { margin-top: 3rem; padding: 3rem 1.5rem; text-align: center; border: 1px solid var(--border); border-radius: calc(var(--radius) * 2); background: var(--muted); }
+.gallery-empty h2 { font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 0 0 .8rem; }
+.gallery-empty p { max-width: 36rem; margin: 0 auto 1.5rem; color: var(--muted-foreground); line-height: 1.7; }
 .page-hero { height: min(66vh, 40rem); position: relative; color: var(--primary-foreground); display: flex; align-items: flex-end; }
 .page-hero > div:last-child { position: relative; z-index: 2; width: min(100% - 2rem,76rem); margin: 0 auto; padding-bottom: 4rem; }
 .page-hero h1 { font-size: clamp(3rem,7vw,6rem); line-height: .98; margin: .7rem 0 1rem; max-width: 55rem; }
