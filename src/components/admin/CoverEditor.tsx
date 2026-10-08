@@ -12,7 +12,7 @@ export function CoverEditor({ cover, onChange }: { cover?: Cover | null | undefi
   const photos = useQuery({ queryKey: ['admin', 'cover-photos'], queryFn: async () => { const { data, error } = await supabase.from('gallery_photos').select('id,path,caption,alt'); if (error) throw new Error('Galleria non disponibile'); return data; } });
   useEffect(() => { if (!source) return; const url = URL.createObjectURL(source); setPreview(url); return () => URL.revokeObjectURL(url); }, [source]);
   async function select(path: string, label: string) {
-    const r = await fetch(`/api/public/img/${path}`); if (!r.ok) throw new Error('Foto non disponibile'); setSource(await r.blob()); setAlt(label); setX(50); setY(50);
+    const { data, error } = await supabase.storage.from('gallery').download(path); if (error || !data) throw new Error('Foto non disponibile'); setSource(data); setAlt(label); setX(50); setY(50);
   }
   return <section className="space-y-3 border-t border-border pt-4">
     <h3 className="text-lg">Copertina</h3>
@@ -27,7 +27,7 @@ export function CoverEditor({ cover, onChange }: { cover?: Cover | null | undefi
     <div className="flex flex-wrap gap-2"><Button className={btn} disabled={s.busy || (!source && !cover)} onClick={() => s.run(async () => {
       if (!alt.trim()) throw new Error('Descrivi la foto nel testo alternativo');
       let blob = source;
-      if (!blob && cover) { const r = await fetch(`/api/public/img/${cover.path}`); if (!r.ok) throw new Error('Foto non disponibile'); blob = await r.blob(); }
+      if (!blob && cover) { const { data, error } = await supabase.storage.from('gallery').download(cover.path); if (error || !data) throw new Error('Foto non disponibile'); blob = data; }
       if (!blob) return;
       const result = await coverFromBlob(blob, alt.trim(), x, y, async (path, image) => { const { error } = await supabase.storage.from('gallery').upload(path, image, { contentType: 'image/webp', upsert: true, cacheControl: '31536000' }); if (error) throw new Error('Caricamento copertina non riuscito'); });
       onChange(result);
