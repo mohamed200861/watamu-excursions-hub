@@ -259,7 +259,7 @@ export function DetailPage({ lang, kind, slug }: { lang: Locale; kind: Kind; slu
       </Shell>
     );
   const hasDays = item.itinerary.length > 0;
-  const inSafari = kind !== "parks" || c.safari.some((s) => s.parks.some((p) => p.toLowerCase() === item.title.toLowerCase()));
+  const inSafari = kind !== "parks" || c.safari.some((s) => s.parks.some((p) => p.toLowerCase().includes(item.slug.replace(/-/g, " "))));
   if (!inSafari)
     return (
       <Shell lang={lang} subject={item.title}>
