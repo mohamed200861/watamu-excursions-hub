@@ -1,3 +1,4 @@
+import { passwordTooShort } from "@/lib/password";
 import { SITE_URL } from "@/lib/site";
 import { Link, Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -135,6 +136,8 @@ function Login() {
       run(async () => {
         const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (error) throw new Error("Email o password non corretti.");
+        // Older passwords shorter than the minimum must be replaced right away.
+        if (passwordTooShort(password)) await supabase.auth.updateUser({ data: { must_change_password: true } });
       }, "Accesso eseguito");
     }
   }
