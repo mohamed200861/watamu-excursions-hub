@@ -28,6 +28,7 @@ type PhotoRow = {
   caption: string;
   alt: string;
   category: string;
+  hidden?: boolean;
 };
 export type Raw = { content: Record<string, any>; packages: Row[]; photos: PhotoRow[] };
 
@@ -87,6 +88,7 @@ function toPkg(r: Row, lang: Locale): Pkg {
   if (!t) return base;
   return {
     ...base,
+    cover: base.cover ? { ...base.cover, alt: t.title } : null,
     title: t.title,
     duration: t.duration,
     description: t.description,
@@ -136,7 +138,7 @@ const enPages: Record<"about" | "contact" | "gallery", PageText> = {
   },
 };
 const enFaq = [
-  { q: "What time do safaris depart?", a: "Departures are at 6:00. Each day includes morning and afternoon game drives, with lunch and overnight at a lodge or camp." },
+  { q: "What time do safaris depart?", a: "Departures are usually around 6:00. As a rule there are morning and afternoon game drives, with lunch and overnight at a lodge or camp; on transfer days the programme may change." },
   { q: "What does the safari include?", a: en.included.join(", ") + "." },
   { q: "What is not included?", a: en.excluded.join(", ") + "." },
   { q: "What should I bring?", a: en.bring.join(", ") + "." },
@@ -148,8 +150,9 @@ function aboutFor(a: AboutText | undefined, it: boolean): AboutText {
   const base = a ?? { title: "", subtitle: "", text: "" };
   const photos = Array.isArray(base.photos) ? base.photos.filter((p) => p && p.path) : [];
   if (it) return { ...base, photos };
+  const enPhotos = photos.map((p, i) => ({ ...p, alt: i === 0 ? "Africano di Africa, guide of ECO TOURS AND SAFARI'S, with travellers in Kenya" : "Africano di Africa on safari in Kenya" }));
   const lic = base.license && base.license.text.trim() ? { ...base.license, text: "Licensed guide, Kenya Tourism Regulatory Authority (TRA), Class E" } : base.license;
-  return { ...enPages.about, meTitle: "About me", me: base.me ? enMe : "", photos, license: lic ?? { text: "", number: "", expires: "" } };
+  return { ...enPages.about, meTitle: "About me", me: base.me ? enMe : "", photos: enPhotos, license: lic ?? { text: "", number: "", expires: "" } };
 }
 const enTemplate = "Hello Africano! I would like information about {pacchetto}. People: {persone}. Dates: {date}.";
 
@@ -159,23 +162,40 @@ export function buildContent(raw: Raw, lang: Locale): SiteContent {
   const whatsapp = (settings.whatsapp || "254742161072").replace(/\D/g, "");
   const rows = [...raw.packages].sort((a, b) => a.sort - b.sort);
   const pk = (kind: string) => rows.filter((r) => r.kind === kind).map((r) => toPkg(r, lang));
-  const photos: Photo[] = raw.photos.map((p) => ({
+  const it = lang === "it";
+  const catAlt: Record<string, [string, string]> = {
+    safari: ["Safari nei parchi del Kenya", "Safari in Kenya's parks"],
+    mare: ["Il mare e la costa di Watamu", "The sea and coast of Watamu"],
+    persone: ["Persone incontrate durante i viaggi in Kenya", "People met on our trips in Kenya"],
+  };
+  // File-like names (IMG-2026…) are not real descriptions; English pages cannot show Italian alt text.
+  const photoAlt = (p: PhotoRow) => {
+    const generic = (catAlt[p.category] ?? catAlt["safari"]!)[it ? 0 : 1];
+    const own = (p.alt || p.caption || "").trim();
+    if (!it || !own || /^(img|dsc|pxl|wa|photo|image)?[-_ ]?\d/i.test(own) || /^img[-_]/i.test(own)) return generic;
+    return own;
+  };
+  const photos: Photo[] = raw.photos.filter((p) => !p.hidden && p.width > 0 && p.height > 0 && p.thumb_path).map((p) => ({
     id: p.id,
     src: `/api/public/img/${p.path}`,
     thumb: `/api/public/img/${p.thumb_path}`,
     width: p.width,
     height: p.height,
     caption: p.caption,
-    alt: p.alt || p.caption,
+    alt: photoAlt(p),
     category: p.category,
   }));
-  const it = lang === "it";
+  const home = (it ? c["home"] : { ...enHome, heroImage: c["home"]?.heroImage ?? null, seaImage: c["home"]?.seaImage ?? null }) as HomeText;
+  if (!it) {
+    if (home.heroImage) home.heroImage = { ...home.heroImage, alt: "Safari in Kenya with ECO TOURS AND SAFARI'S" };
+    if (home.seaImage) home.seaImage = { ...home.seaImage, alt: "The Kenyan coast at Watamu" };
+  }
   return {
     owner: { name: "", address: "", email: "", phone: "", license: "", retention: "", transfers: "", law: "", ...c["owner"] },
     lang,
     whatsapp,
     template: it ? settings.template || "Ciao Africano! Vorrei informazioni su {pacchetto}." : enTemplate,
-    home: it ? (c["home"] as HomeText) : enHome,
+    home,
     about: aboutFor(c["about"] as AboutText | undefined, it),
     contact: it ? (c["contact"] as PageText) : enPages.contact,
     gallery: it ? (c["gallery"] as PageText) : enPages.gallery,
