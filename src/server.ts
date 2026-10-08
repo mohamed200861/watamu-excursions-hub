@@ -53,7 +53,6 @@ function withHeaders(response: Response, url: URL): Response {
   h.set("X-Content-Type-Options", "nosniff");
   h.set("Referrer-Policy", "strict-origin-when-cross-origin");
   h.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()");
-  h.set("X-Frame-Options", "SAMEORIGIN");
   if (url.protocol === "https:") h.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   h.set(
     "Content-Security-Policy",
