@@ -56,6 +56,8 @@ export type HomeText = {
   seaTitle: string;
   seaText: string;
   footerText: string;
+  heroImage?: Cover | null;
+  seaImage?: Cover | null;
 };
 
 export type SiteContent = {
@@ -81,6 +83,17 @@ export function whatsappHref(c: Pick<SiteContent, "whatsapp" | "template">, subj
     .replaceAll("{persone}", "…")
     .replaceAll("{date}", "…");
   return `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(text)}`;
+}
+
+/** wa.me link with a fixed message (no {persone}/{date} placeholders). */
+export function whatsappTextHref(whatsapp: string, text: string) {
+  return `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
+}
+
+/** Splits "Item one, Item two, item three" lists written in one sentence: a new item starts after a comma followed by a capital letter. */
+export function sentenceList(text: string): string[] | null {
+  const parts = text.replace(/\.\s*$/, "").split(/,\s+(?=[A-ZÀ-Ý])/);
+  return parts.length >= 3 ? parts.map((x) => x.trim()) : null;
 }
 
 export function phoneLabel(n: string) {
