@@ -461,7 +461,7 @@ function FaqAnswer({ text }: { text: string }) {
   return <ul className="faq-list">{items.map((x, i) => <li key={i}>{x.charAt(0).toUpperCase() + x.slice(1)}</li>)}</ul>;
 }
 /** Image that falls back to a bundled photo if the uploaded one fails, so no broken icon is ever shown. */
-function CoverImg({ cover, fallback, alt, priority = false }: { cover?: Cover | null; fallback: string; alt: string; priority?: boolean }) {
+function CoverImg({ cover, fallback, alt, priority = false }: { cover?: Cover | null | undefined; fallback: string; alt: string; priority?: boolean }) {
   const [failed, setFailed] = useState(false);
   const own = cover && !failed;
   return <img src={own ? `/api/public/img/${cover.path}` : fallback} alt={own ? cover.alt || alt : alt} width="1600" height="1000" loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : "auto"} decoding="async" style={own ? { objectPosition: `${cover.focal_x}% ${cover.focal_y}%` } : undefined} onError={() => setFailed(true)} />;

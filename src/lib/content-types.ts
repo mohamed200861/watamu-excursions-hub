@@ -56,8 +56,8 @@ export type HomeText = {
   seaTitle: string;
   seaText: string;
   footerText: string;
-  heroImage?: Cover | null;
-  seaImage?: Cover | null;
+  heroImage?: Cover | null | undefined;
+  seaImage?: Cover | null | undefined;
 };
 
 export type SiteContent = {
