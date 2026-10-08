@@ -40,6 +40,8 @@ const contentSchemas = {
     seaTitle: str(120),
     seaText: str(400),
     footerText: str(300),
+    heroImage: coverSchemaAbout().nullable().default(null),
+    seaImage: coverSchemaAbout().nullable().default(null),
   }),
   owner: z.object({ name: str(200), address: str(400), email: z.union([z.literal(""), z.string().trim().email().max(200)]), phone: str(80), license: str(120), retention: str(1000).default(""), transfers: str(1000).default(""), law: str(1000).default("") }),
   about: page.extend({
@@ -164,13 +166,15 @@ export const registerPhoto = createServerFn({ method: "POST" })
 export const updatePhoto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({ id: z.string().uuid(), caption: str(300).optional(), alt: str(300).optional(), category: z.enum(["safari", "mare", "persone"]).optional(), hidden: z.boolean().optional() }).parse(d),
+    z.object({ id: z.string().uuid(), caption: str(300).optional(), alt: str(300).optional(), category: z.enum(["safari", "mare", "persone"]).optional(), hidden: z.boolean().optional(), thumb_path: photoPath.optional(), width: z.number().int().min(1).max(2560).optional(), height: z.number().int().min(1).max(2560).optional() }).parse(d),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { id, ...rest } = data;
     const { error } = await (context.supabase as any).from("gallery_photos").update(rest).eq("id", id);
     fail(error, "Salvataggio non riuscito");
+    if (rest.hidden !== undefined) await log(context, rest.hidden ? "photo.hide" : "photo.show", { id });
+    if (rest.thumb_path || rest.width) await log(context, "photo.repair", { id });
     return { ok: true };
   });
 

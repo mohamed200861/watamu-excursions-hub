@@ -6,7 +6,7 @@ import wildlife from "@/assets/kenya-wildlife.webp";
 import creek from "@/assets/mida-creek.webp";
 import { counterpart } from "@/lib/seo";
 import { useContent } from "@/lib/content-client";
-import { licenseActive, phoneLabel, whatsappHref, type AboutText, type Kind, type Locale, type Pkg, type Photo } from "@/lib/content-types";
+import { licenseActive, phoneLabel, sentenceList, whatsappHref, type AboutText, type Cover, type Kind, type Locale, type Pkg, type Photo } from "@/lib/content-types";
 import { useEffect, useState } from "react";
 const nav = {
   it: ["Safari", "Escursioni", "Parchi", "Chi siamo", "Galleria", "Contatti"],
@@ -112,7 +112,7 @@ export function Shell({ lang, children, subject }: { lang: Locale; children: Rea
       <section className="footer-invite"><h2>{lang === "it" ? "Pianifichiamo il tuo safari su misura" : "Let’s plan your tailor-made safari"}</h2><a className="button" href={whatsappHref(c, subject || (lang === "it" ? "un safari su misura" : "a tailor-made safari"))} target="_blank" rel="noreferrer">WhatsApp <WhatsAppIcon /></a></section>
       <footer className="site-footer">
         <div className="footer-main">
-          <div className="footer-brand"><img src={logo.url} alt="ECO TOURS AND SAFARI'S" width="96" height="96" /><h2>ECO TOURS<br />AND SAFARI'S</h2><p>{c.home.footerText}</p><div className="social-links"><a href="https://instagram.com/africano_di_africa_" aria-label="Instagram @africano_di_africa_" target="_blank" rel="noreferrer"><InstagramIcon /></a><a href={whatsappHref(c, subject || "ECO TOURS AND SAFARI'S")} aria-label="WhatsApp" target="_blank" rel="noreferrer"><WhatsAppIcon /></a></div><small>@africano_di_africa_</small></div>
+          <div className="footer-brand"><img src={logo.url} alt="ECO TOURS AND SAFARI'S" width="96" height="96" /><h2>ECO TOURS<br />AND SAFARI'S</h2><p>{c.home.footerText}</p><div className="social-links"><a href="https://instagram.com/africano_di_africa_" aria-label={lang === "it" ? "Instagram di Africano di Africa (@africano_di_africa_), si apre in una nuova scheda" : "Africano di Africa on Instagram (@africano_di_africa_), opens in a new tab"} title="Instagram @africano_di_africa_" target="_blank" rel="noreferrer"><InstagramIcon /></a><a href={whatsappHref(c, subject || "ECO TOURS AND SAFARI'S")} aria-label={lang === "it" ? `Scrivi su WhatsApp al ${phoneLabel(c.whatsapp)}, si apre in una nuova scheda` : `Message us on WhatsApp at ${phoneLabel(c.whatsapp)}, opens in a new tab`} title={`WhatsApp ${phoneLabel(c.whatsapp)}`} target="_blank" rel="noreferrer"><WhatsAppIcon /></a></div><small>@africano_di_africa_</small></div>
           {(["safari", "excursions", "parks"] as const).map((kind, i) => <nav key={kind} aria-label={nav[lang][i]}><h3>{nav[lang][i]}</h3><Link to="/$lang/$section" params={{ lang, section: p[kind] }}>{[["Tutti i safari", "All safaris"], ["Tutte le escursioni", "All excursions"], ["Tutti i parchi", "All parks"]][i]![lang === "it" ? 0 : 1]}</Link>{c[kind].slice(0, 3).map(item => <Link key={item.slug} to="/$lang/$section/$slug" params={{ lang, section: p[kind], slug: item.slug }}>{item.title}</Link>)}</nav>)}
           <nav aria-label={nav[lang][5]}><h3>{nav[lang][5]}</h3><Link to="/$lang/$section" params={{ lang, section: p.contact }}>{nav[lang][5]}</Link><Link to="/$lang/$section" params={{ lang, section: p.about }}>{nav[lang][3]}</Link><Link to="/$lang/$section" params={{ lang, section: p.gallery }}>{nav[lang][4]}</Link><a href={whatsappHref(c, subject || "ECO TOURS AND SAFARI'S")} target="_blank" rel="noreferrer">{phoneLabel(c.whatsapp)}</a></nav>
         </div>
@@ -123,7 +123,7 @@ export function Shell({ lang, children, subject }: { lang: Locale; children: Rea
         href={whatsappHref(c, subject || (lang === "it" ? "un viaggio in Kenya" : "a trip to Kenya"))}
         target="_blank"
         rel="noreferrer"
-        aria-label="WhatsApp"
+        aria-label={lang === "it" ? `Scrivi su WhatsApp al ${phoneLabel(c.whatsapp)}` : `Message us on WhatsApp at ${phoneLabel(c.whatsapp)}`}
       >
         <WhatsAppIcon />
       </a>
@@ -137,13 +137,7 @@ export function Home({ lang }: { lang: Locale }) {
   return (
     <Shell lang={lang}>
       <section className="hero">
-        <img
-          src={safariHero}
-          alt={lang === "it" ? "Safari nella savana del Kenya al tramonto" : "Safari in the Kenyan savanna at sunset"}
-          width="1600"
-          height="1000"
-          fetchPriority="high"
-        />
+        <CoverImg cover={h.heroImage} fallback={safariHero} alt={lang === "it" ? "Safari nella savana del Kenya al tramonto" : "Safari in the Kenyan savanna at sunset"} priority />
         <div className="hero-shade" />
         <div className="hero-copy">
           <p className="eyebrow">{h.heroEyebrow}</p>
@@ -175,7 +169,7 @@ export function Home({ lang }: { lang: Locale }) {
       </section>
       <Listing title={h.featuredTitle} intro={h.featuredIntro} items={c.safari.slice(0, 3)} lang={lang} kind="safari" />
       <section className="split-feature">
-        <img src={coast} alt="Watamu coast" width="1200" height="800" loading="lazy" />
+        <CoverImg cover={h.seaImage} fallback={coast} alt={lang === "it" ? "La costa di Watamu" : "The Watamu coast"} />
         <div>
           <p className="eyebrow">{h.seaEyebrow}</p>
           <h2>{h.seaTitle}</h2>
@@ -265,6 +259,14 @@ export function DetailPage({ lang, kind, slug }: { lang: Locale; kind: Kind; slu
       </Shell>
     );
   const hasDays = item.itinerary.length > 0;
+  const inSafari = kind !== "parks" || c.safari.some((s) => s.parks.some((p) => p.toLowerCase().includes(item.slug.replace(/-/g, " "))));
+  if (!inSafari)
+    return (
+      <Shell lang={lang} subject={item.title}>
+        <section className="page-hero package-hero"><PackagePhoto item={item} /><div className="hero-shade" /><div><p className="eyebrow">{lang === "it" ? "Parco del Kenya" : "Kenya park"}</p><h1>{item.title}</h1><p>{lang === "it" ? "Chiedi ad Africano su WhatsApp se questo parco può far parte del tuo safari su misura." : "Ask Africano on WhatsApp whether this park can be part of your tailor-made safari."}</p></div></section>
+        <section className="detail band"><article><a className="button" href={whatsappHref(c, item.title)} target="_blank" rel="noreferrer">{lang === "it" ? "Chiedi informazioni" : "Ask for information"}</a></article></section>
+      </Shell>
+    );
   return (
     <Shell lang={lang} subject={item.title}>
       <section className="page-hero package-hero"><PackagePhoto item={item} /><div className="hero-shade" /><div><p className="eyebrow">{item.duration}</p><h1>{item.title}</h1><p>{item.description}</p></div></section>
@@ -345,12 +347,7 @@ export function SimplePage({ lang, type }: { lang: Locale; type: "about" | "gall
         <p className="lead">{t.text}</p>
         {type === "about" && <AboutMe a={c.about} lang={lang} />}
         {type === "gallery" ? (
-          <Gallery lang={lang} photos={c.photos.length > 0 ? c.photos : [
-            { id: "t1", src: safariHero, thumb: safariHero, width: 1600, height: 1000, caption: "Safari", alt: "Kenyan safari", category: "safari" },
-            { id: "t2", src: coast, thumb: coast, width: 1200, height: 800, caption: "Watamu", alt: "Watamu coast", category: "mare" },
-            { id: "t3", src: wildlife, thumb: wildlife, width: 1200, height: 800, caption: "Tsavo", alt: "Elephant in Tsavo", category: "safari" },
-            { id: "t4", src: creek, thumb: creek, width: 1200, height: 800, caption: "Mida Creek", alt: "Mida Creek", category: "mare" },
-          ]} />
+          <Gallery lang={lang} photos={c.photos} waHref={whatsappHref(c, lang === "it" ? "le foto dei safari" : "safari photos")} />
         ) : (
           <a className="button" href={whatsappHref(c, type === "contact" ? (lang === "it" ? "un viaggio in Kenya" : "a trip to Kenya") : "ECO TOURS AND SAFARI'S")} target="_blank" rel="noreferrer">
             WhatsApp · {phoneLabel(c.whatsapp)}
@@ -370,7 +367,7 @@ function AboutMe({ a, lang }: { a: AboutText; lang: Locale }) {
       {photos.length > 0 && (
         <div className="about-photos">
           {photos.map((ph, i) => (
-            <img key={ph.path} src={`/api/public/img/${i === 0 ? ph.path : ph.thumb_path}`} alt={ph.alt} width={i === 0 ? 1600 : 480} height={i === 0 ? 1000 : 300} loading={i === 0 ? "eager" : "lazy"} fetchPriority={i === 0 ? "high" : "auto"} decoding="async" style={{ objectPosition: `${ph.focal_x}% ${ph.focal_y}%` }} />
+            <img onError={(e) => { e.currentTarget.style.display = "none"; }} key={ph.path} src={`/api/public/img/${i === 0 ? ph.path : ph.thumb_path}`} alt={ph.alt} width={i === 0 ? 1600 : 480} height={i === 0 ? 1000 : 300} loading={i === 0 ? "eager" : "lazy"} fetchPriority={i === 0 ? "high" : "auto"} decoding="async" style={{ objectPosition: `${ph.focal_x}% ${ph.focal_y}%` }} />
           ))}
         </div>
       )}
@@ -382,7 +379,9 @@ function AboutMe({ a, lang }: { a: AboutText; lang: Locale }) {
     </section>
   );
 }
-function Gallery({ photos, lang }: { photos: Photo[]; lang: Locale }) {
+function Gallery({ photos: all, lang, waHref }: { photos: Photo[]; lang: Locale; waHref: string }) {
+  const [broken, setBroken] = useState<string[]>([]);
+  const photos = all.filter((p) => !broken.includes(p.id));
   const [open, setOpen] = useState<number | null>(null);
   const go = (d: number) => setOpen((i) => (i === null ? i : (i + d + photos.length) % photos.length));
   useEffect(() => {
@@ -393,12 +392,20 @@ function Gallery({ photos, lang }: { photos: Photo[]; lang: Locale }) {
     return () => { document.removeEventListener("keydown", key); document.body.style.overflow = ""; };
   }, [open]);
   const cur = open === null ? null : photos[open];
+  if (photos.length === 0)
+    return (
+      <div className="gallery-empty">
+        <h2>{lang === "it" ? "Le nuove foto arrivano presto" : "New photos are coming soon"}</h2>
+        <p>{lang === "it" ? "Stiamo preparando la galleria. Nel frattempo chiedi ad Africano su WhatsApp le foto dei safari e delle escursioni." : "We are preparing the gallery. In the meantime, ask Africano on WhatsApp for photos of our safaris and excursions."}</p>
+        <a className="button" href={waHref} target="_blank" rel="noreferrer">WhatsApp <WhatsAppIcon /></a>
+      </div>
+    );
   return (
     <>
       <div className="gallery">
         {photos.map((ph, i) => (
           <button key={ph.id} type="button" className="gallery-item" onClick={() => setOpen(i)} aria-label={(lang === "it" ? "Ingrandisci: " : "Enlarge: ") + (ph.caption || ph.alt)}>
-            <img src={ph.thumb} srcSet={ph.thumb !== ph.src ? `${ph.thumb} 640w, ${ph.src} ${ph.width}w` : undefined} sizes="(max-width: 860px) 50vw, 33vw" alt={ph.alt} width={ph.width} height={ph.height} loading={i < 6 ? "eager" : "lazy"} decoding="async" />
+            <img src={ph.thumb} srcSet={ph.thumb !== ph.src ? `${ph.thumb} 640w, ${ph.src} ${ph.width}w` : undefined} sizes="(max-width: 860px) 50vw, 33vw" alt={ph.alt} width={ph.width} height={ph.height} loading={i < 6 ? "eager" : "lazy"} decoding="async" onError={() => setBroken((b) => [...b, ph.id])} />
             {ph.caption && <span>{ph.caption}</span>}
           </button>
         ))}
@@ -442,11 +449,22 @@ function Faq({ lang }: { lang: Locale }) {
             {f.q}
             <span>+</span>
           </summary>
-          <p>{f.a}</p>
+          <FaqAnswer text={f.a} />
         </details>
       ))}
     </section>
   );
+}
+function FaqAnswer({ text }: { text: string }) {
+  const items = sentenceList(text);
+  if (!items) return <p>{text}</p>;
+  return <ul className="faq-list">{items.map((x, i) => <li key={i}>{x.charAt(0).toUpperCase() + x.slice(1)}</li>)}</ul>;
+}
+/** Image that falls back to a bundled photo if the uploaded one fails, so no broken icon is ever shown. */
+function CoverImg({ cover, fallback, alt, priority = false }: { cover?: Cover | null | undefined; fallback: string; alt: string; priority?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  const own = cover && !failed;
+  return <img src={own ? `/api/public/img/${cover.path}` : fallback} alt={own ? cover.alt || alt : alt} width="1600" height="1000" loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : "auto"} decoding="async" style={own ? { objectPosition: `${cover.focal_x}% ${cover.focal_y}%` } : undefined} onError={() => setFailed(true)} />;
 }
 function WhatsAppIcon() {
   return (
@@ -465,7 +483,8 @@ function fallbackPhoto(slug: string) {
   return wildlife;
 }
 function PackagePhoto({ item, thumb = false }: { item: Pkg; thumb?: boolean }) {
-  if (!item.cover) return <img src={fallbackPhoto(item.slug)} alt={item.title} width={thumb ? 480 : 1600} height={thumb ? 300 : 1000} loading={thumb ? "lazy" : "eager"} />;
-  return <img src={`/api/public/img/${thumb ? item.cover.thumb_path : item.cover.path}`} alt={item.cover.alt} width={thumb ? 480 : 1600} height={thumb ? 300 : 1000} loading={thumb ? "lazy" : "eager"} fetchPriority={thumb ? "auto" : "high"} style={thumb ? undefined : { objectPosition: `${item.cover.focal_x}% ${item.cover.focal_y}%` }} />;
+  const [failed, setFailed] = useState(false);
+  if (!item.cover || failed) return <img src={fallbackPhoto(item.slug)} alt={item.title} width={thumb ? 480 : 1600} height={thumb ? 300 : 1000} loading={thumb ? "lazy" : "eager"} />;
+  return <img src={`/api/public/img/${thumb ? item.cover.thumb_path : item.cover.path}`} alt={item.cover.alt} width={thumb ? 480 : 1600} height={thumb ? 300 : 1000} loading={thumb ? "lazy" : "eager"} fetchPriority={thumb ? "auto" : "high"} style={thumb ? undefined : { objectPosition: `${item.cover.focal_x}% ${item.cover.focal_y}%` }} onError={() => setFailed(true)} />;
 }
 function InstagramIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".8" /></svg>; }

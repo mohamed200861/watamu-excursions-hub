@@ -48,7 +48,7 @@
         "Depart Nairobi at 6:00 for Masai Mara. Lunch, afternoon game drive and overnight.",
         "Morning and afternoon game drives in Masai Mara, lunch and a second night at lodge or camp.",
         "Depart after the morning game drive for Lake Nakuru. Lunch, afternoon safari and overnight.",
-        "Breakfast at 6:00 and transfer only to Amboseli, with no morning game drive. Lunch, afternoon safari and overnight.",
+        "Breakfast at 6:00 and transfer only to Amboseli, with no morning game drive. Lunch, afternoon safari, an after-dinner performance by a group from the Masai tribe, and overnight.",
         "Final game drive and breakfast, then return or transfer to Mombasa airport."
       ],
       "parks": [
@@ -57,7 +57,7 @@
         "Amboseli National Park"
       ]
     },
-    "grande-kenya-6-giorni": {
+    "masai-mara-nakuru-amboseli-tsavo-est-6-giorni": {
       "title": "Masai Mara, Nakuru, Amboseli & Tsavo East",
       "duration": "6 days / 5 nights",
       "description": "A grand journey through four Kenyan ecosystems.",
@@ -65,7 +65,7 @@
         "Depart at 6:00 for Masai Mara, lunch, afternoon game drive and overnight.",
         "Morning and afternoon game drives in Masai Mara, lunch and a second night.",
         "Transfer to Lake Nakuru, lunch, afternoon game drive and overnight.",
-        "Breakfast at 6:00 and transfer only to Amboseli, with no morning game drive. Lunch, afternoon safari and overnight.",
+        "Breakfast at 6:00 and transfer only to Amboseli, with no morning game drive. Lunch, afternoon safari, an after-dinner performance by a group from the Masai tribe, and overnight.",
         "Morning game drive and transfer to Tsavo East. Lunch, afternoon safari and overnight.",
         "Morning game drive, breakfast and lunch. Return to Watamu or Mombasa airport."
       ],
@@ -76,7 +76,7 @@
         "Tsavo Est National Park"
       ]
     },
-    "kenya-completo-7-giorni": {
+    "masai-mara-nakuru-amboseli-taita-hills-tsavo-est-7-giorni": {
       "title": "The complete Kenya journey",
       "duration": "7 days / 6 nights",
       "description": "From the Mara’s big cats to Tsavo’s red earth, via Taita Hills.",
@@ -84,7 +84,7 @@
         "Depart at 6:00 for Masai Mara, lunch, afternoon game drive and overnight.",
         "Morning and afternoon game drives in Masai Mara, lunch and a second night.",
         "Transfer to Lake Nakuru, lunch, afternoon safari and overnight.",
-        "Breakfast at 6:00 and transfer only to Amboseli, with no morning game drive. Lunch, afternoon safari and overnight.",
+        "Breakfast at 6:00 and transfer only to Amboseli, with no morning game drive. Lunch, afternoon safari, an after-dinner performance by a group from the Masai tribe, and overnight.",
         "Transfer to Taita Hills, lunch and afternoon game drive. Optional paid night safari with a ranger.",
         "Morning game drive and transfer to Tsavo East. Lunch, afternoon safari and overnight.",
         "Final game drive, breakfast and lunch. Return to Watamu or Mombasa airport."

@@ -25,3 +25,5 @@
 
 - The app never uses the service-role key: admin actions run with the signed-in admin's token (src/lib/admin-auth.ts) and admin management goes through has_role-guarded security-definer SQL functions; public backend URL/key are read only via src/lib/supabase-config.ts, so Cloudflare deploys need public variables only.
 - Lockfile must stay compatible with the Bun version in .bun-version: after any dependency change regenerate bun.lock with that Bun version and confirm a clean install leaves it unchanged. Cloudflare Workers Builds' automatic frozen install rejects text bun.lock files, so the deploy relies on SKIP_DEPENDENCY_INSTALL=true and a build command of `bun install && bun run build`.
+- Security and cache headers (CSP, HSTS, nosniff, immutable caching) are set in src/server.ts for every Worker response; keeping them in one place avoids drift between hosts.
+- Gallery photos have a hidden flag that every public read (content.server, snapshot, storage policy) filters out; hiding never deletes, so photos stay recoverable.
