@@ -1,3 +1,4 @@
+import { MIN_PASSWORD, passwordTooShort } from "@/lib/password";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,7 +34,7 @@ function ResetPassword() {
   function submit(e: FormEvent) {
     e.preventDefault();
     run(async () => {
-      if (password.length < 8) throw new Error("La password deve avere almeno 8 caratteri.");
+      if (passwordTooShort(password)) throw new Error(`La password deve avere almeno ${MIN_PASSWORD} caratteri.`);
       if (password !== confirm) throw new Error("Le due password non coincidono.");
       const { error } = await supabase.auth.updateUser({ password, data: { must_change_password: false } });
       if (error) throw new Error("Impossibile aggiornare la password: scegline una più sicura o richiedi un nuovo link.");

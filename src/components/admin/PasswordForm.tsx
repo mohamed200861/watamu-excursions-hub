@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Field, btn, input, useStatus } from "@/components/admin/ui";
+import { MIN_PASSWORD, passwordTooShort } from "@/lib/password";
 
 /** Change password while signed in: requires the current password. */
 export function PasswordForm({ onDone }: { onDone?: () => void }) {
@@ -12,7 +13,7 @@ export function PasswordForm({ onDone }: { onDone?: () => void }) {
   function submit(e: FormEvent) {
     e.preventDefault();
     run(async () => {
-      if (password.length < 10) throw new Error("La nuova password deve avere almeno 10 caratteri.");
+      if (passwordTooShort(password)) throw new Error(`La nuova password deve avere almeno ${MIN_PASSWORD} caratteri.`);
       if (password !== confirm) throw new Error("Le due password non coincidono.");
       if (password === current) throw new Error("La nuova password deve essere diversa da quella attuale.");
       const { data: u } = await supabase.auth.getUser();
@@ -34,8 +35,8 @@ export function PasswordForm({ onDone }: { onDone?: () => void }) {
       <Field label="Password attuale">
         <input className={input} type="password" autoComplete="current-password" required value={current} onChange={(e) => setCurrent(e.target.value)} />
       </Field>
-      <Field label="Nuova password" hint="Almeno 10 caratteri">
-        <input className={input} type="password" autoComplete="new-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+      <Field label="Nuova password" hint={`Almeno ${MIN_PASSWORD} caratteri`}>
+        <input className={input} type="password" autoComplete="new-password" required minLength={MIN_PASSWORD} value={password} onChange={(e) => setPassword(e.target.value)} />
       </Field>
       <Field label="Ripeti la nuova password">
         <input className={input} type="password" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
