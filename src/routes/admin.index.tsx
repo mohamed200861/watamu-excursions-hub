@@ -30,7 +30,7 @@ function TextsPage() {
   const c = q.data;
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">Le modifiche compaiono sul sito in italiano entro circa un minuto.</p>
+      <p className="text-sm text-muted-foreground">Il sito si aggiorna in circa un minuto. I testi inglesi restano fissi: per cambiarli chiedi allo sviluppatore.</p>
       <Block keyName="home" title="Home" initial={c["home"] ?? {}} render={(v, set) => <HomeForm v={v} set={set} />} />
       <Block keyName="about" title="Chi siamo" initial={c["about"] ?? { title: "", subtitle: "", text: "" }} render={(v, set) => <AboutForm v={v} set={set} />} />
       {(["contact", "gallery"] as const).map((k) => (
@@ -85,6 +85,11 @@ function HomeForm({ v, set }: { v: Any; set: (v: Any) => void }) {
   const why: Any[] = [...(v.why ?? []), {}, {}, {}, {}, {}, {}].slice(0, 6);
   return (
     <>
+      <div className="space-y-2 rounded-md border border-border p-3">
+        <h3 className="text-lg">Foto grande in alto (home)</h3>
+        <p className="text-sm text-muted-foreground">Se non scegli una foto resta quella attuale. Dopo “Prepara copertina” premi “Salva home”.</p>
+        <CoverEditor cover={v.heroImage ?? null} onChange={(x) => set({ ...v, heroImage: x })} />
+      </div>
       <Text label="Riga sopra il titolo" {...f("heroEyebrow")} />
       <Text label="Titolo principale" {...f("heroTitle")} />
       <Area label="Testo sotto il titolo" {...f("heroText")} />
@@ -98,6 +103,10 @@ function HomeForm({ v, set }: { v: Any; set: (v: Any) => void }) {
       ))}
       <Text label="Titolo safari in evidenza" {...f("featuredTitle")} />
       <Area label="Testo safari in evidenza" {...f("featuredIntro")} />
+      <div className="space-y-2 rounded-md border border-border p-3">
+        <h3 className="text-lg">Foto della sezione “Mare e terra”</h3>
+        <CoverEditor cover={v.seaImage ?? null} onChange={(x) => set({ ...v, seaImage: x })} />
+      </div>
       <Text label="Sezione mare – riga sopra" {...f("seaEyebrow")} />
       <Text label="Sezione mare – titolo" {...f("seaTitle")} />
       <Area label="Sezione mare – testo" {...f("seaText")} />
