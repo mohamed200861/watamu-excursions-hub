@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { exportBackup, saveContent } from "@/lib/admin.functions";
-import type { Owner } from "@/lib/content-types";
+import { DEFAULT_EMAIL, DEFAULT_TRIPADVISOR, type Owner } from "@/lib/content-types";
 import { Button, Area, Card, Text, btn, useStatus } from "@/components/admin/ui";
 
 export const Route = createFileRoute("/admin/impostazioni")({ component: SettingsPage });
@@ -26,7 +26,7 @@ function SettingsPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from("site_content").select("data").eq("key", "settings").maybeSingle();
       if (error) throw new Error("Impossibile caricare le impostazioni");
-      return (data?.data ?? {}) as { whatsapp?: string; template?: string };
+      return (data?.data ?? {}) as { whatsapp?: string; template?: string; email?: string; tripadvisor?: string; rating?: string };
     },
   });
   const logQ = useQuery({
@@ -39,10 +39,16 @@ function SettingsPage() {
   });
   const [whatsapp, setWhatsapp] = useState("");
   const [template, setTemplate] = useState("");
+  const [email, setEmail] = useState(DEFAULT_EMAIL);
+  const [tripadvisor, setTripadvisor] = useState(DEFAULT_TRIPADVISOR);
+  const [rating, setRating] = useState("");
   useEffect(() => {
     if (settings.data) {
       setWhatsapp(settings.data.whatsapp ?? "");
       setTemplate(settings.data.template ?? "");
+      setEmail(settings.data.email ?? DEFAULT_EMAIL);
+      setTripadvisor(settings.data.tripadvisor ?? DEFAULT_TRIPADVISOR);
+      setRating(settings.data.rating ?? "");
     }
   }, [settings.data]);
   const save = useServerFn(saveContent);
@@ -54,7 +60,7 @@ function SettingsPage() {
   return (
     <div className="space-y-4">
       <OwnerEditor />
-      <Card title="WhatsApp">
+      <Card title="WhatsApp, email e Tripadvisor">
         <Text label="Numero WhatsApp" hint="Solo cifre con prefisso internazionale, senza + (es. 254742161072)" value={whatsapp} onChange={setWhatsapp} />
         <Area
           label="Messaggio precompilato"
@@ -63,9 +69,12 @@ function SettingsPage() {
           onChange={setTemplate}
         />
         <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">Anteprima: {preview}</p>
+        <Text label="Email di contatto" hint="Mostrata nel footer, in Contatti e nelle pagine legali" value={email} onChange={setEmail} />
+        <Text label="Link Tripadvisor" hint="Indirizzo completo della tua pagina Tripadvisor" value={tripadvisor} onChange={setTripadvisor} />
+        <Text label="Testo valutazione (facoltativo)" hint="Es. la tua valutazione su Tripadvisor. Se vuoto non viene mostrato" value={rating} onChange={setRating} />
         {s1.view}
-        <button className={btn} disabled={s1.busy} onClick={() => s1.run(() => save({ data: { key: "settings", data: { whatsapp: whatsapp.replace(/\D/g, ""), template } } }))}>
-          Salva WhatsApp
+        <button className={btn} disabled={s1.busy} onClick={() => s1.run(() => save({ data: { key: "settings", data: { whatsapp: whatsapp.replace(/\D/g, ""), template, email: email.trim(), tripadvisor: tripadvisor.trim(), rating: rating.trim() } } }))}>
+          Salva contatti
         </button>
       </Card>
       <Card title="Backup">
@@ -112,6 +121,6 @@ function OwnerEditor() {
   const q = useQuery({ queryKey: ["admin", "owner"], queryFn: async () => { const { data, error } = await supabase.from("site_content").select("data").eq("key", "owner").maybeSingle(); if (error) throw new Error("Dati non disponibili"); return data?.data as Partial<Owner> | undefined; } });
   useEffect(() => { if (q.data) setOwner({ ...empty, ...q.data }); }, [q.data]);
   const save = useServerFn(saveContent), s = useStatus();
-  const labels: Partial<Record<keyof Owner, string>> = { name: "Nome o ragione sociale", address: "Indirizzo (facoltativo)", email: "Email pubblica di contatto", phone: "Telefono pubblico", retention: "Privacy – per quanto tempo conservi log, messaggi e preventivi", transfers: "Privacy – fornitori e Paesi dove sono trattati i dati", law: "Termini – legge applicabile e foro (bozza: da verificare)" };
+  const labels: Partial<Record<keyof Owner, string>> = { name: "Nome o ragione sociale", address: "Indirizzo (facoltativo)", phone: "Telefono pubblico", retention: "Privacy – per quanto tempo conservi log, messaggi e preventivi", transfers: "Privacy – fornitori e Paesi dove sono trattati i dati", law: "Termini – legge applicabile e foro (bozza: da verificare)" };
   return <Card title="Titolare e pagine legali"><p className="text-sm text-muted-foreground">Le pagine legali entrano su Google quando sono compilati nome, email o telefono, conservazione, fornitori/Paesi e legge applicabile.</p>{q.error && <p role="alert" className="text-destructive">Impossibile caricare i dati.</p>}{(Object.keys(labels) as (keyof Owner)[]).map(k => <Text key={k} label={labels[k] ?? k} hint="Se vuoto, non viene mostrato ai visitatori" value={owner[k]} onChange={v => setOwner({ ...owner, [k]: v })} />)}{s.view}<Button className={btn} disabled={s.busy || q.isLoading || !!q.error} onClick={() => s.run(() => save({ data: { key: "owner", data: owner } }))}>Salva dati titolare</Button></Card>;
 }

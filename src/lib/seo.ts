@@ -1,3 +1,4 @@
+import { ALTERNATE_NAME, DEFAULT_TRIPADVISOR } from "@/lib/content-types";
 import type { Kind, Locale, SiteContent } from "@/lib/content-types";
 import { SITE_URL, clamp } from "@/lib/site";
 const absolute = (path: string) => (path.startsWith("https://") ? path : `${SITE_URL}${path}`);
