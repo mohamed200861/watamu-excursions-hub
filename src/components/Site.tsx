@@ -347,15 +347,49 @@ export function SimplePage({ lang, type }: { lang: Locale; type: "about" | "gall
       <section className="simple band">
         <p className="lead">{t.text}</p>
         {type === "about" && <AboutMe a={c.about} lang={lang} />}
-        {type === "contact" && c.email && <p className="contact-email"><a className="text-link" href={`mailto:${c.email}`}>{c.email}</a></p>}
-        {type === "gallery" ? (
+        {type === "contact" ? (
+          <div className="contact-grid">
+            <a className="contact-card featured" href={whatsappHref(c, lang === "it" ? "un viaggio in Kenya" : "a trip to Kenya")} target="_blank" rel="noreferrer">
+              <span className="contact-icon wa"><WhatsAppIcon /></span>
+              <small>WhatsApp</small>
+              <strong>{phoneLabel(c.whatsapp)}</strong>
+              <span>{lang === "it" ? "Scrivi ad Africano per safari, escursioni e itinerari su misura." : "Message Africano about safaris, excursions and tailor-made trips."}</span>
+              <em>{lang === "it" ? "Apri WhatsApp" : "Open WhatsApp"} →</em>
+            </a>
+            {c.email && (
+              <a className="contact-card" href={`mailto:${c.email}`}>
+                <span className="contact-icon"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg></span>
+                <small>Email</small>
+                <strong className="break">{c.email}</strong>
+                <span>{lang === "it" ? "Per richieste più dettagliate." : "For more detailed requests."}</span>
+                <em>{lang === "it" ? "Invia un'email" : "Send an email"} →</em>
+              </a>
+            )}
+            {c.tripadvisor && (
+              <a className="contact-card" href={c.tripadvisor} target="_blank" rel="noopener noreferrer">
+                <span className="contact-icon"><TripadvisorIcon /></span>
+                <small>{lang === "it" ? "Le nostre recensioni" : "Our reviews"}</small>
+                <strong>Tripadvisor</strong>
+                <span>{c.rating || (lang === "it" ? "Leggi cosa raccontano i viaggiatori." : "Read what travellers say.")}</span>
+                <em>{lang === "it" ? "Leggi le recensioni" : "Read the reviews"} →</em>
+              </a>
+            )}
+            <a className="contact-card" href="https://instagram.com/africano_di_africa_" target="_blank" rel="noreferrer">
+              <span className="contact-icon"><InstagramIcon /></span>
+              <small>Instagram</small>
+              <strong>@africano_di_africa_</strong>
+              <span>{lang === "it" ? "Foto e video dai safari." : "Photos and videos from the safaris."}</span>
+              <em>{lang === "it" ? "Segui su Instagram" : "Follow on Instagram"} →</em>
+            </a>
+          </div>
+        ) : type === "gallery" ? (
           <Gallery lang={lang} photos={c.photos} waHref={whatsappHref(c, lang === "it" ? "le foto dei safari" : "safari photos")} />
         ) : (
-          <a className="button" href={whatsappHref(c, type === "contact" ? (lang === "it" ? "un viaggio in Kenya" : "a trip to Kenya") : "ECO TOURS AND SAFARI'S")} target="_blank" rel="noreferrer">
+          <a className="button" href={whatsappHref(c, "ECO TOURS AND SAFARI'S")} target="_blank" rel="noreferrer">
             WhatsApp · {phoneLabel(c.whatsapp)}
           </a>
         )}
-        {type !== "gallery" && c.tripadvisor && (
+        {type === "about" && c.tripadvisor && (
           <section className="reviews" aria-labelledby="reviews-title">
             <h2 id="reviews-title">{lang === "it" ? "Le nostre recensioni" : "Our reviews"}</h2>
             {c.rating && <p>{c.rating}</p>}
