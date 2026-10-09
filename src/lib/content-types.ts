@@ -77,6 +77,7 @@ export type SiteContent = {
   excursions: Pkg[];
   parks: Pkg[];
   photos: Photo[];
+  headers?: Partial<Record<HeaderKey, Cover | null>>;
 };
 
 export function whatsappHref(c: Pick<SiteContent, "whatsapp" | "template">, subject: string) {

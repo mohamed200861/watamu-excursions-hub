@@ -205,5 +205,10 @@ export function buildContent(raw: Raw, lang: Locale): SiteContent {
     excursions: pk("excursion"),
     parks: pk("park"),
     photos,
+    headers: Object.fromEntries(
+      Object.entries((c["headers"] ?? {}) as Record<string, Cover | null>)
+        .filter(([, v]) => v && v.path)
+        .map(([k, v]) => [k, it ? v : { ...v!, alt: "ECO TOURS AND SAFARI'S – Kenya" }]),
+    ),
   };
 }
