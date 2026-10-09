@@ -32,6 +32,22 @@ function TextsPage() {
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">Il sito si aggiorna in circa un minuto. I testi inglesi restano fissi: per cambiarli chiedi allo sviluppatore.</p>
       <Block keyName="home" title="Home" initial={c["home"] ?? {}} render={(v, set) => <HomeForm v={v} set={set} />} />
+      <Block
+        keyName="headers"
+        title="Foto in alto delle pagine"
+        initial={c["headers"] ?? {}}
+        render={(v, set) => (
+          <>
+            <p className="text-sm text-muted-foreground">Se non scegli una foto resta quella attuale. Dopo “Prepara copertina” premi “Salva foto in alto delle pagine”.</p>
+            {([["safari", "Pagina Safari"], ["excursions", "Pagina Escursioni"], ["parks", "Pagina Parchi"], ["about", "Pagina Chi siamo"], ["gallery", "Pagina Galleria"], ["contact", "Pagina Contatti"]] as const).map(([k, label]) => (
+              <div key={k} className="space-y-2 rounded-md border border-border p-3">
+                <h3 className="text-lg">{label}</h3>
+                <CoverEditor cover={v[k] ?? null} onChange={(x) => set({ ...v, [k]: x })} />
+              </div>
+            ))}
+          </>
+        )}
+      />
       <Block keyName="about" title="Chi siamo" initial={c["about"] ?? { title: "", subtitle: "", text: "" }} render={(v, set) => <AboutForm v={v} set={set} />} />
       {(["contact", "gallery"] as const).map((k) => (
         <Block
