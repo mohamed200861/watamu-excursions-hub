@@ -4,6 +4,9 @@ export type Kind = "safari" | "excursions" | "parks";
 export type HeaderKey = Kind | "about" | "gallery" | "contact";
 export const HEADER_KEYS: HeaderKey[] = ["safari", "excursions", "parks", "about", "gallery", "contact"];
 
+export const DEFAULT_EMAIL = "eazyafricanah@gmail.com";
+export const DEFAULT_TRIPADVISOR = "https://www.tripadvisor.it/Attraction_Review-g661279-d34035492-Reviews-Africano_Di_Africa_Kenya_Safari_Tours-Watamu_Coast_Province.html";
+export const ALTERNATE_NAME = "Africano Di Africa Kenya Safari Tours";
 export type Cover = { path: string; thumb_path: string; og_path: string; alt: string; focal_x: number; focal_y: number };
 export type Owner = { name: string; address: string; email: string; phone: string; license: string; retention: string; transfers: string; law: string };
 
@@ -67,6 +70,9 @@ export type SiteContent = {
   lang: Locale;
   whatsapp: string;
   template: string;
+  email: string;
+  tripadvisor: string;
+  rating: string;
   home: HomeText;
   about: AboutText;
   contact: PageText;

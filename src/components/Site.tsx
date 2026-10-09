@@ -112,9 +112,9 @@ export function Shell({ lang, children, subject }: { lang: Locale; children: Rea
       <section className="footer-invite"><h2>{lang === "it" ? "Pianifichiamo il tuo safari su misura" : "Let’s plan your tailor-made safari"}</h2><a className="button" href={whatsappHref(c, subject || (lang === "it" ? "un safari su misura" : "a tailor-made safari"))} target="_blank" rel="noreferrer">WhatsApp <WhatsAppIcon /></a></section>
       <footer className="site-footer">
         <div className="footer-main">
-          <div className="footer-brand"><img src={logo.url} alt="ECO TOURS AND SAFARI'S" width="96" height="96" /><h2>ECO TOURS<br />AND SAFARI'S</h2><p>{c.home.footerText}</p><div className="social-links"><a href="https://instagram.com/africano_di_africa_" aria-label={lang === "it" ? "Instagram di Africano di Africa (@africano_di_africa_), si apre in una nuova scheda" : "Africano di Africa on Instagram (@africano_di_africa_), opens in a new tab"} title="Instagram @africano_di_africa_" target="_blank" rel="noreferrer"><InstagramIcon /></a><a href={whatsappHref(c, subject || "ECO TOURS AND SAFARI'S")} aria-label={lang === "it" ? `Scrivi su WhatsApp al ${phoneLabel(c.whatsapp)}, si apre in una nuova scheda` : `Message us on WhatsApp at ${phoneLabel(c.whatsapp)}, opens in a new tab`} title={`WhatsApp ${phoneLabel(c.whatsapp)}`} target="_blank" rel="noreferrer"><WhatsAppIcon /></a></div><small>@africano_di_africa_</small></div>
+          <div className="footer-brand"><img src={logo.url} alt="ECO TOURS AND SAFARI'S" width="96" height="96" /><h2>ECO TOURS<br />AND SAFARI'S</h2><p>{c.home.footerText}</p><div className="social-links"><a href="https://instagram.com/africano_di_africa_" aria-label={lang === "it" ? "Instagram di Africano di Africa (@africano_di_africa_), si apre in una nuova scheda" : "Africano di Africa on Instagram (@africano_di_africa_), opens in a new tab"} title="Instagram @africano_di_africa_" target="_blank" rel="noreferrer"><InstagramIcon /></a><a href={whatsappHref(c, subject || "ECO TOURS AND SAFARI'S")} aria-label={lang === "it" ? `Scrivi su WhatsApp al ${phoneLabel(c.whatsapp)}, si apre in una nuova scheda` : `Message us on WhatsApp at ${phoneLabel(c.whatsapp)}, opens in a new tab`} title={`WhatsApp ${phoneLabel(c.whatsapp)}`} target="_blank" rel="noreferrer" className="wa"><WhatsAppIcon /></a>{c.tripadvisor && <a href={c.tripadvisor} aria-label={lang === "it" ? "Recensioni su Tripadvisor" : "Reviews on Tripadvisor"} title="Tripadvisor" target="_blank" rel="noopener noreferrer"><TripadvisorIcon /></a>}</div><small>@africano_di_africa_</small></div>
           {(["safari", "excursions", "parks"] as const).map((kind, i) => <nav key={kind} aria-label={nav[lang][i]}><h3>{nav[lang][i]}</h3><Link to="/$lang/$section" params={{ lang, section: p[kind] }}>{[["Tutti i safari", "All safaris"], ["Tutte le escursioni", "All excursions"], ["Tutti i parchi", "All parks"]][i]![lang === "it" ? 0 : 1]}</Link>{c[kind].slice(0, 3).map(item => <Link key={item.slug} to="/$lang/$section/$slug" params={{ lang, section: p[kind], slug: item.slug }}>{item.title}</Link>)}</nav>)}
-          <nav aria-label={nav[lang][5]}><h3>{nav[lang][5]}</h3><Link to="/$lang/$section" params={{ lang, section: p.contact }}>{nav[lang][5]}</Link><Link to="/$lang/$section" params={{ lang, section: p.about }}>{nav[lang][3]}</Link><Link to="/$lang/$section" params={{ lang, section: p.gallery }}>{nav[lang][4]}</Link><a href={whatsappHref(c, subject || "ECO TOURS AND SAFARI'S")} target="_blank" rel="noreferrer">{phoneLabel(c.whatsapp)}</a></nav>
+          <nav aria-label={nav[lang][5]}><h3>{nav[lang][5]}</h3><Link to="/$lang/$section" params={{ lang, section: p.contact }}>{nav[lang][5]}</Link><Link to="/$lang/$section" params={{ lang, section: p.about }}>{nav[lang][3]}</Link><Link to="/$lang/$section" params={{ lang, section: p.gallery }}>{nav[lang][4]}</Link><a href={whatsappHref(c, subject || "ECO TOURS AND SAFARI'S")} target="_blank" rel="noreferrer">{phoneLabel(c.whatsapp)}</a>{c.email && <a href={`mailto:${c.email}`}>{c.email}</a>}</nav>
         </div>
         <div className="footer-bottom"><small>© {new Date().getUTCFullYear()} ECO TOURS AND SAFARI'S</small><nav aria-label={lang === "it" ? "Informazioni legali" : "Legal information"}>{["privacy", "cookie", lang === "it" ? "termini" : "terms"].map(section => <Link key={section} to="/$lang/$section" params={{ lang, section }}>{section === "termini" ? "Termini" : section.charAt(0).toUpperCase() + section.slice(1)}</Link>)}</nav><div className="footer-languages"><Link to="/$lang" params={{ lang: "it" }} aria-current={lang === "it" ? "page" : undefined}>IT</Link><Link to="/$lang" params={{ lang: "en" }} aria-current={lang === "en" ? "page" : undefined}>EN</Link></div><a href="#top" className="back-top">{lang === "it" ? "Torna su" : "Back to top"} ↑</a></div>
       </footer>
@@ -347,12 +347,20 @@ export function SimplePage({ lang, type }: { lang: Locale; type: "about" | "gall
       <section className="simple band">
         <p className="lead">{t.text}</p>
         {type === "about" && <AboutMe a={c.about} lang={lang} />}
+        {type === "contact" && c.email && <p className="contact-email"><a className="text-link" href={`mailto:${c.email}`}>{c.email}</a></p>}
         {type === "gallery" ? (
           <Gallery lang={lang} photos={c.photos} waHref={whatsappHref(c, lang === "it" ? "le foto dei safari" : "safari photos")} />
         ) : (
           <a className="button" href={whatsappHref(c, type === "contact" ? (lang === "it" ? "un viaggio in Kenya" : "a trip to Kenya") : "ECO TOURS AND SAFARI'S")} target="_blank" rel="noreferrer">
             WhatsApp · {phoneLabel(c.whatsapp)}
           </a>
+        )}
+        {type !== "gallery" && c.tripadvisor && (
+          <section className="reviews" aria-labelledby="reviews-title">
+            <h2 id="reviews-title">{lang === "it" ? "Le nostre recensioni" : "Our reviews"}</h2>
+            {c.rating && <p>{c.rating}</p>}
+            <a className="button" href={c.tripadvisor} target="_blank" rel="noopener noreferrer">{lang === "it" ? "Leggi le recensioni su Tripadvisor" : "Read the reviews on Tripadvisor"}</a>
+          </section>
         )}
       </section>
     </Shell>
@@ -488,4 +496,5 @@ function PackagePhoto({ item, thumb = false }: { item: Pkg; thumb?: boolean }) {
   if (!item.cover || failed) return <img src={fallbackPhoto(item.slug)} alt={item.title} width={thumb ? 480 : 1600} height={thumb ? 300 : 1000} loading={thumb ? "lazy" : "eager"} />;
   return <img src={`/api/public/img/${thumb ? item.cover.thumb_path : item.cover.path}`} alt={item.cover.alt} width={thumb ? 480 : 1600} height={thumb ? 300 : 1000} loading={thumb ? "lazy" : "eager"} fetchPriority={thumb ? "auto" : "high"} style={thumb ? undefined : { objectPosition: `${item.cover.focal_x}% ${item.cover.focal_y}%` }} onError={() => setFailed(true)} />;
 }
+function TripadvisorIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="7" cy="13" r="3.5" /><circle cx="17" cy="13" r="3.5" /><circle cx="7" cy="13" r=".9" fill="currentColor" /><circle cx="17" cy="13" r=".9" fill="currentColor" /><path d="M3 8.5c2.5-2 5.5-3 9-3s6.5 1 9 3M10.5 16.5 12 19l1.5-2.5" /></svg>; }
 function InstagramIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".8" /></svg>; }

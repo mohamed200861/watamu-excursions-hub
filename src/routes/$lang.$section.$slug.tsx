@@ -10,14 +10,14 @@ export const Route = createFileRoute("/$lang/$section/$slug")({
     const c = await loadContent(getLocale(params.lang));
     const item = c[kind].find((x) => x.slug === params.slug);
     if (!item) throw notFound();
-    return { kind, title: item.title, description: item.description, whatsapp: c.whatsapp, image: item.cover ? `/api/public/img/${item.cover.og_path}` : undefined };
+    return { kind, title: item.title, description: item.description, whatsapp: c.whatsapp, tripadvisor: c.tripadvisor, image: item.cover ? `/api/public/img/${item.cover.og_path}` : undefined };
   },
   staleTime: 60_000,
   head: ({ params, loaderData }) => {
     const l = getLocale(params.lang);
     const path = `/${l}/${params.section}/${params.slug}`;
     if (!loaderData) return headFor(l, l === "it" ? "Esperienza non trovata" : "Experience not found", "ECO TOURS AND SAFARI'S", path, undefined, undefined, true);
-    const { kind, title, description, whatsapp, image } = loaderData;
+    const { kind, title, description, whatsapp, tripadvisor, image } = loaderData;
     const [seoTitle, seoDesc] = detailSeo(l, kind, title);
     const img = image ? abs(image) : undefined;
     const primary =
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/$lang/$section/$slug")({
       "@context": "https://schema.org",
       "@graph": [
         primary,
-        agencySchema(whatsapp),
+        agencySchema(whatsapp, tripadvisor),
         {
           "@type": "BreadcrumbList",
           itemListElement: [
