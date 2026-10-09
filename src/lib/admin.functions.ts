@@ -52,6 +52,7 @@ const contentSchemas = {
   }),
   contact: page,
   gallery: page,
+  headers: z.object(Object.fromEntries(["safari", "excursions", "parks", "about", "gallery", "contact"].map((k) => [k, coverSchemaAbout().nullable().default(null)]))),
   faq: z.object({ items: z.array(z.object({ q: str(200).min(1), a: str(1500).min(1) })).max(30) }),
   info: z.object({ bring: list() }),
   settings: z.object({

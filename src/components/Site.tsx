@@ -236,6 +236,7 @@ export function IndexPage({ lang, kind }: { lang: Locale; kind: Kind }) {
         title={titles[lang][kind]}
         text={lang === "it" ? "Esperienze curate da Africano di Africa, tra natura, incontri e paesaggi indimenticabili." : "Journeys curated by Africano di Africa, through nature, encounters and unforgettable landscapes."}
         image={kind === "excursions" ? coast : wildlife}
+        cover={c.headers?.[kind]}
       />
       <Listing
         title={titles[lang][kind]}
@@ -342,7 +343,7 @@ export function SimplePage({ lang, type }: { lang: Locale; type: "about" | "gall
   const t = c[type];
   return (
     <Shell lang={lang}>
-      <PageHero title={t.title} text={t.subtitle} image={type === "gallery" ? creek : type === "about" ? wildlife : coast} />
+      <PageHero title={t.title} text={t.subtitle} cover={c.headers?.[type]} image={type === "gallery" ? creek : type === "about" ? wildlife : coast} />
       <section className="simple band">
         <p className="lead">{t.text}</p>
         {type === "about" && <AboutMe a={c.about} lang={lang} />}
@@ -424,10 +425,10 @@ function Gallery({ photos: all, lang, waHref }: { photos: Photo[]; lang: Locale;
     </>
   );
 }
-function PageHero({ title, text, image, kicker }: { title: string; text: string; image: string; kicker?: string }) {
+function PageHero({ title, text, image, kicker, cover }: { title: string; text: string; image: string; kicker?: string; cover?: Cover | null | undefined }) {
   return (
     <section className="page-hero">
-      <img src={image} alt="" width="1600" height="1000" />
+      <CoverImg cover={cover} fallback={image} alt="" priority />
       <div className="hero-shade" />
       <div>
         <p className="eyebrow">{kicker ?? "ECO TOURS AND SAFARI'S"}</p>

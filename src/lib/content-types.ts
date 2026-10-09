@@ -1,6 +1,8 @@
 export type Locale = "it" | "en";
 export type ImageKey = "safari" | "coast" | "wildlife" | "creek";
 export type Kind = "safari" | "excursions" | "parks";
+export type HeaderKey = Kind | "about" | "gallery" | "contact";
+export const HEADER_KEYS: HeaderKey[] = ["safari", "excursions", "parks", "about", "gallery", "contact"];
 
 export type Cover = { path: string; thumb_path: string; og_path: string; alt: string; focal_x: number; focal_y: number };
 export type Owner = { name: string; address: string; email: string; phone: string; license: string; retention: string; transfers: string; law: string };
@@ -75,6 +77,7 @@ export type SiteContent = {
   excursions: Pkg[];
   parks: Pkg[];
   photos: Photo[];
+  headers?: Partial<Record<HeaderKey, Cover | null>>;
 };
 
 export function whatsappHref(c: Pick<SiteContent, "whatsapp" | "template">, subject: string) {
