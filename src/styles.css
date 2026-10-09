@@ -329,7 +329,8 @@ footer.site-footer { display: block; padding-bottom: 6rem; }
 .contact-card.featured strong { font-size: 2rem; }
 .contact-card .break { overflow-wrap: anywhere; }
 .contact-card span:not(.contact-icon) { line-height: 1.6; opacity: .85; }
-.contact-card em { font-style: normal; font-weight: 600; margin-top: .6rem; color: var(--accent); }
+.contact-card em { font-style: normal; font-weight: 600; margin-top: .6rem; color: var(--primary); }
+.contact-card.featured em { color: var(--primary-foreground); }
 .contact-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent); margin-bottom: .6rem; }
 .contact-icon svg { width: 24px; height: 24px; }
 .contact-icon.wa svg { fill: currentColor; }
