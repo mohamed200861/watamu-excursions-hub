@@ -195,7 +195,7 @@ export function buildContent(raw: Raw, lang: Locale): SiteContent {
     if (home.seaImage) home.seaImage = { ...home.seaImage, alt: "The Kenyan coast at Watamu" };
   }
   return {
-    owner: { name: "", address: "", email: "", phone: "", license: "", retention: "", transfers: "", law: "", ...c["owner"], email },
+    owner: { name: "", address: "", phone: "", license: "", retention: "", transfers: "", law: "", ...c["owner"], email },
     email,
     tripadvisor,
     rating,
