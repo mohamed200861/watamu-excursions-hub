@@ -316,7 +316,11 @@ footer.site-footer { display: block; padding-bottom: 6rem; }
 .social-links { display: flex; gap: .75rem; margin: 1rem 0; }
 .social-links a { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--primary-foreground); border-radius: 50%; }
 .social-links svg { width: 22px; height: 22px; }
-.social-links a:last-child svg { fill: currentColor; }
+.social-links a.wa svg { fill: currentColor; }
+.reviews { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+.reviews h2 { margin-bottom: 1rem; }
+.reviews p { margin-bottom: 1rem; }
+.contact-email { margin-bottom: 1.5rem; }
 .footer-bottom { padding-right: 4rem; border-top: 1px solid color-mix(in oklab,var(--primary-foreground) 30%,transparent); margin-top: 3rem; padding-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: center; }
 .footer-bottom nav { flex-direction: row; flex-wrap: wrap; }
 .footer-languages { display: flex; gap: .5rem; }
