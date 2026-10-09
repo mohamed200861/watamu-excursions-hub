@@ -71,6 +71,13 @@
       "when": 1791484938285,
       "tag": "0009_published_files_hidden_and_home_images",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791539325413,
+      "tag": "0010_page_header_images",
+      "breakpoints": true
     }
   ]
 }
