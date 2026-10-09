@@ -320,7 +320,20 @@ footer.site-footer { display: block; padding-bottom: 6rem; }
 .reviews { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
 .reviews h2 { margin-bottom: 1rem; }
 .reviews p { margin-bottom: 1rem; }
-.contact-email { margin-bottom: 1.5rem; }
+.contact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 2.5rem; text-align: left; }
+.contact-card { display: flex; flex-direction: column; gap: .35rem; padding: 1.6rem; border: 1px solid var(--border); border-radius: 1.25rem; background: var(--card); color: var(--foreground); text-decoration: none; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.contact-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 14px 30px -18px color-mix(in oklab, var(--primary) 45%, transparent); }
+.contact-card.featured { grid-column: 1 / -1; background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+.contact-card small { font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+.contact-card strong { font-family: var(--font-display, inherit); font-size: 1.45rem; line-height: 1.25; }
+.contact-card.featured strong { font-size: 2rem; }
+.contact-card .break { overflow-wrap: anywhere; }
+.contact-card span:not(.contact-icon) { line-height: 1.6; opacity: .85; }
+.contact-card em { font-style: normal; font-weight: 600; margin-top: .6rem; color: var(--accent); }
+.contact-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent); margin-bottom: .6rem; }
+.contact-icon svg { width: 24px; height: 24px; }
+.contact-icon.wa svg { fill: currentColor; }
+@media (max-width: 640px) { .contact-grid { grid-template-columns: 1fr; } .contact-card.featured strong { font-size: 1.6rem; } }
 .footer-bottom { padding-right: 4rem; border-top: 1px solid color-mix(in oklab,var(--primary-foreground) 30%,transparent); margin-top: 3rem; padding-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: center; }
 .footer-bottom nav { flex-direction: row; flex-wrap: wrap; }
 .footer-languages { display: flex; gap: .5rem; }
