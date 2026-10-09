@@ -88,11 +88,12 @@ export function kindFor(section: string): Kind | null {
   return null;
 }
 export const abs = absolute;
-export function agencySchema(whatsapp: string) {
+export function agencySchema(whatsapp: string, tripadvisor: string = DEFAULT_TRIPADVISOR) {
   return {
     "@type": ["TravelAgency", "LocalBusiness"],
     "@id": `${SITE_URL}/#organization`,
     name: "ECO TOURS AND SAFARI'S",
+    alternateName: ALTERNATE_NAME,
     url: SITE_URL,
     logo: `${SITE_URL}/eco-tours-logo.svg`,
     image: `${SITE_URL}/eco-tours-og.webp`,
@@ -102,7 +103,7 @@ export function agencySchema(whatsapp: string) {
     knowsLanguage: ["it", "en"],
     areaServed: ["Watamu", "Malindi", "Kenya"],
     telephone: `+${whatsapp}`,
-    sameAs: ["https://instagram.com/africano_di_africa_", `https://wa.me/${whatsapp}`],
+    sameAs: ["https://instagram.com/africano_di_africa_", `https://wa.me/${whatsapp}`, ...(tripadvisor ? [tripadvisor] : [])],
   };
 }
 export type { SiteContent };

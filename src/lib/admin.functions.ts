@@ -58,6 +58,9 @@ const contentSchemas = {
   settings: z.object({
     whatsapp: z.string().trim().regex(/^\d{8,15}$/, "Numero WhatsApp: solo cifre con prefisso, es. 254742161072"),
     template: str(500).min(5).refine((t) => t.includes("{pacchetto}"), "Il messaggio deve contenere {pacchetto}"),
+    email: z.union([z.literal(""), z.string().trim().email("Email di contatto non valida").max(200)]).optional(),
+    tripadvisor: z.union([z.literal(""), z.string().trim().url("Link Tripadvisor non valido").max(500).refine((u) => /^https:\/\/(www\.)?tripadvisor\.[a-z.]+\//.test(u), "Il link deve essere di tripadvisor")]).optional(),
+    rating: str(200).optional(),
   }),
 } as const;
 type ContentKey = keyof typeof contentSchemas;

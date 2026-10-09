@@ -1,6 +1,7 @@
 import { requireSupabaseConfig } from "./supabase-config";
 import snapshot from "./content-snapshot.json";
 import en from "./content-en.json";
+import { DEFAULT_EMAIL, DEFAULT_TRIPADVISOR } from "./content-types";
 import type { AboutText, Cover, HomeText, ImageKey, Locale, PageText, Photo, Pkg, SiteContent } from "./content-types";
 
 type Row = {
@@ -158,7 +159,10 @@ const enTemplate = "Hello Africano! I would like information about {pacchetto}. 
 
 export function buildContent(raw: Raw, lang: Locale): SiteContent {
   const c = raw.content;
-  const settings = (c["settings"] ?? {}) as { whatsapp?: string; template?: string };
+  const settings = (c["settings"] ?? {}) as { whatsapp?: string; template?: string; email?: string; tripadvisor?: string; rating?: string };
+  const email = (settings.email ?? c["owner"]?.email ?? DEFAULT_EMAIL).trim();
+  const tripadvisor = (settings.tripadvisor ?? DEFAULT_TRIPADVISOR).trim();
+  const rating = (settings.rating ?? "").trim();
   const whatsapp = (settings.whatsapp || "254742161072").replace(/\D/g, "");
   const rows = [...raw.packages].sort((a, b) => a.sort - b.sort);
   const pk = (kind: string) => rows.filter((r) => r.kind === kind).map((r) => toPkg(r, lang));
@@ -191,7 +195,10 @@ export function buildContent(raw: Raw, lang: Locale): SiteContent {
     if (home.seaImage) home.seaImage = { ...home.seaImage, alt: "The Kenyan coast at Watamu" };
   }
   return {
-    owner: { name: "", address: "", email: "", phone: "", license: "", retention: "", transfers: "", law: "", ...c["owner"] },
+    owner: { name: "", address: "", email: "", phone: "", license: "", retention: "", transfers: "", law: "", ...c["owner"], email },
+    email,
+    tripadvisor,
+    rating,
     lang,
     whatsapp,
     template: it ? settings.template || "Ciao Africano! Vorrei informazioni su {pacchetto}." : enTemplate,
