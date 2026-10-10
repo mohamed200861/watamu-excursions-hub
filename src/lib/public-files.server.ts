@@ -8,14 +8,30 @@ const sections = {
 export async function sitemapXml(origin: string) {
   const raw = await loadRaw();
   const c = buildContent(raw, "it");
-  const pairs: [string, string][] = [["/it", "/en"]];
-  sections.it.list.forEach((s, i) => pairs.push([`/it/${s}`, `/en/${sections.en.list[i]}`]));
+  const owner = c.owner;
+  const { legalComplete } = await import("./legal");
+  const esc = (x: string) => x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  type Entry = { it: string; en: string; lastmod?: string; images?: { loc: string; title: string }[] };
+  const legalOk = legalComplete(owner);
+  const entries: Entry[] = [{ it: "/it", en: "/en" }];
+  sections.it.list.forEach((s, i) => {
+    if (!legalOk && ["privacy", "cookie", "termini"].includes(s)) return; // noindex pages stay out
+    entries.push({
+      it: `/it/${s}`, en: `/en/${sections.en.list[i]}`,
+      images: s === "galleria" ? c.photos.map((p) => ({ loc: `${origin}/api/public/img/${p.path}`, title: p.alt || p.caption })) : undefined,
+    });
+  });
+  const updated = new Map(raw.packages.map((r) => [r.slug, (r as { updated_at?: string }).updated_at]));
   for (const k of ["safari", "excursions", "parks"] as const)
-    for (const p of c[k]) pairs.push([`/it/${sections.it[k]}/${p.slug}`, `/en/${sections.en[k]}/${p.slug}`]);
-  const url = (loc: string, it: string, en: string) =>
-    `<url><loc>${origin}${loc}</loc><xhtml:link rel="alternate" hreflang="it" href="${origin}${it}"/><xhtml:link rel="alternate" hreflang="en" href="${origin}${en}"/><xhtml:link rel="alternate" hreflang="x-default" href="${origin}${it}"/></url>`;
-  const body = pairs.map(([it, en]) => url(it, it, en) + url(en, it, en)).join("");
-  return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${body}</urlset>`;
+    for (const p of c[k]) entries.push({
+      it: `/it/${sections.it[k]}/${p.slug}`, en: `/en/${sections.en[k]}/${p.slug}`,
+      lastmod: updated.get(p.slug)?.slice(0, 10),
+      images: p.cover?.path ? [{ loc: `${origin}/api/public/img/${p.cover.path}`, title: p.cover.alt || p.title }] : undefined,
+    });
+  const url = (loc: string, e: Entry) =>
+    `<url><loc>${origin}${loc}</loc>${e.lastmod ? `<lastmod>${e.lastmod}</lastmod>` : ""}<xhtml:link rel="alternate" hreflang="it" href="${origin}${e.it}"/><xhtml:link rel="alternate" hreflang="en" href="${origin}${e.en}"/><xhtml:link rel="alternate" hreflang="x-default" href="${origin}${e.it}"/>${(e.images ?? []).map((im) => `<image:image><image:loc>${esc(im.loc)}</image:loc></image:image>`).join("")}</url>`;
+  const body = entries.map((e) => url(e.it, e) + url(e.en, e)).join("");
+  return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${body}</urlset>`;
 }
 
 export async function llmsTxt(origin: string) {
@@ -53,6 +69,29 @@ export async function llmsTxt(origin: string) {
     "Prezzi e date: su richiesta via WhatsApp.",
     "",
   ].join("\n");
+}
+
+export async function llmsFullTxt(origin: string) {
+  const raw = await loadRaw();
+  const out: string[] = [await llmsTxt(origin), "", "# Dettaglio completo dei pacchetti", ""];
+  for (const lang of ["it", "en"] as const) {
+    const c = buildContent(raw, lang);
+    out.push(lang === "it" ? "## Italiano" : "## English", "");
+    for (const k of ["safari", "excursions", "parks"] as const)
+      for (const p of c[k]) {
+        out.push(`### ${p.title}`, `URL: ${origin}/${lang}/${sections[lang][k]}/${p.slug}`);
+        if (p.duration) out.push(`${lang === "it" ? "Durata" : "Duration"}: ${p.duration}`);
+        if (p.parks.length) out.push(`${lang === "it" ? "Parchi" : "Parks"}: ${p.parks.join(", ")}`);
+        out.push("", p.description.trim(), "");
+        if (p.itinerary.length) out.push(lang === "it" ? "Itinerario:" : "Itinerary:", ...p.itinerary.map((d, i) => `${i + 1}. ${d}`), "");
+        if (p.included.length) out.push(lang === "it" ? "Incluso:" : "Included:", ...p.included.map((x) => `- ${x}`), "");
+        if (p.excluded.length) out.push(lang === "it" ? "Non incluso:" : "Not included:", ...p.excluded.map((x) => `- ${x}`), "");
+        if (k !== "parks") out.push(`${lang === "it" ? "Prezzo" : "Price"}: ${p.price || (lang === "it" ? "su richiesta via WhatsApp" : "on request via WhatsApp")}`, "");
+      }
+    if (c.faq.length) out.push(lang === "it" ? "## Domande frequenti" : "## FAQ", "", ...c.faq.flatMap((f) => [`Q: ${f.q}`, `A: ${f.a}`, ""]));
+  }
+  out.push(`Prenotazione: si scrive su WhatsApp (https://wa.me/${buildContent(raw, "it").whatsapp}); programma e condizioni sono definiti nel preventivo.`, "");
+  return out.join("\n");
 }
 
 export function robotsTxt(origin: string) {

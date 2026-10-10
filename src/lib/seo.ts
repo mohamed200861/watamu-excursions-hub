@@ -126,7 +126,7 @@ export function faqSchema(faq: { q: string; a: string }[]) {
 /** Package as TouristTrip (safari/excursion) or TouristAttraction (park). Offers only when a real price exists. */
 export function packageSchema(kind: Kind, p: { title: string; description: string; itinerary: string[]; included: string[]; price?: string | null; parks?: string[] }, path: string, img?: string) {
   const base = { name: p.title, description: p.description, url: absolute(path), ...(img ? { image: img } : {}) };
-  if (kind === "parks") return { "@type": "TouristAttraction", ...base, ...(p.parks?.length ? {} : {}), isAccessibleForFree: false };
+  if (kind === "parks") return { "@type": "TouristAttraction", ...base };
   const priceNum = p.price ? Number(String(p.price).replace(/[^0-9.]/g, "")) : NaN;
   return {
     "@type": "TouristTrip",
