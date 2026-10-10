@@ -85,6 +85,13 @@
       "when": 1791620094999,
       "tag": "0011_role_titolare_enum",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791620144619,
+      "tag": "0012_roles_owner_titolare",
+      "breakpoints": true
     }
   ]
 }
