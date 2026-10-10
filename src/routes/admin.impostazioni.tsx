@@ -7,7 +7,13 @@ import { exportBackup, saveContent } from "@/lib/admin.functions";
 import { DEFAULT_EMAIL, DEFAULT_TRIPADVISOR, type Owner } from "@/lib/content-types";
 import { Button, Area, Card, Text, btn, useStatus } from "@/components/admin/ui";
 
-export const Route = createFileRoute("/admin/impostazioni")({ component: SettingsPage });
+import { useStaffRole } from "@/lib/admin-role";
+
+export const Route = createFileRoute("/admin/impostazioni")({ component: SettingsGate });
+
+function SettingsGate() {
+  return useStaffRole() === "proprietario" ? <SettingsPage /> : <Card title="Pagina riservata"><p className="text-sm text-muted-foreground">Questa pagina è riservata allo sviluppatore.</p></Card>;
+}
 
 const actions: Record<string, string> = {
   "admin.claim": "Attivato amministratore",
@@ -18,6 +24,14 @@ const actions: Record<string, string> = {
   "photo.upload": "Foto caricata",
   "photo.delete": "Foto eliminata",
   "backup.export": "Backup esportato",
+  "login": "Accesso",
+  "logout": "Uscita",
+  "password.change": "Password cambiata",
+  "role.grant": "Ruolo assegnato",
+  "admin.remove": "Accesso rimosso",
+  "photo.hide": "Foto nascosta",
+  "photo.show": "Foto mostrata",
+  "photo.repair": "Foto riparata",
 };
 
 function SettingsPage() {
