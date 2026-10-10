@@ -11,7 +11,7 @@ export async function sitemapXml(origin: string) {
   const owner = c.owner;
   const { legalComplete } = await import("./legal");
   const esc = (x: string) => x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  type Entry = { it: string; en: string; lastmod?: string; images?: { loc: string; title: string }[] };
+  type Entry = { it: string; en: string; lastmod?: string | undefined; images?: { loc: string; title: string }[] | undefined };
   const legalOk = legalComplete(owner);
   const entries: Entry[] = [{ it: "/it", en: "/en" }];
   sections.it.list.forEach((s, i) => {
