@@ -5,15 +5,18 @@ import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { addAdmin, listAdmins, removeAdmin } from "@/lib/admin.functions";
 import { PasswordForm } from "@/components/admin/PasswordForm";
+import { useStaffRole } from "@/lib/admin-role";
 import { Card, Field, btn, btnDanger, btnGhost, errorText, input, useStatus } from "@/components/admin/ui";
 
 export const Route = createFileRoute("/admin/account")({ component: AccountPage });
 
 function AccountPage() {
+  const role = useStaffRole();
   const qc = useQueryClient();
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
+    await supabase.rpc("log_event", { _action: "logout" }).then(() => undefined, () => undefined);
     await supabase.auth.signOut();
   }
   return (
@@ -22,7 +25,7 @@ function AccountPage() {
         <PasswordForm />
       </Card>
       <EmailForm />
-      <Admins />
+      {role === "proprietario" && <Admins />}
       <Card title="Esci">
         <p className="text-sm text-muted-foreground">Chiudi la sessione su questo telefono o computer.</p>
         <button className={`${btnGhost} w-full`} onClick={signOut}>Esci dall'account</button>
@@ -62,7 +65,7 @@ function Admins() {
   const remove = useServerFn(removeAdmin);
   const q = useQuery({ queryKey: ["admin", "admins"], queryFn: () => list() });
   const [email, setEmail] = useState("");
-  const [temp, setTemp] = useState<{ email: string; password: string } | null>(null);
+  const [newRole, setNewRole] = useState<"titolare" | "admin">("titolare");
   const { run, busy, view } = useStatus();
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin", "admins"] });
 
@@ -70,20 +73,19 @@ function Admins() {
     e.preventDefault();
     const target = email.trim();
     run(async () => {
-      const r = await add({ data: { email: target } });
-      setTemp(r.tempPassword ? { email: target, password: r.tempPassword } : null);
+      await add({ data: { email: target, role: newRole } });
       setEmail("");
       refresh();
-    }, "Amministratore aggiunto");
+    }, "Ruolo assegnato");
   }
 
   return (
-    <Card title="Amministratori">
+    <Card title="Utenti e ruoli">
       {q.isError && <p className="text-sm text-destructive">{errorText(q.error)}</p>}
       <ul className="space-y-2">
         {(q.data ?? []).map((a) => (
           <li key={a.id} className="flex items-center justify-between gap-2 rounded-md border border-border p-3 text-sm">
-            <span className="break-all">{a.email}{a.self ? " (tu)" : ""}</span>
+            <span className="break-all">{a.email}{a.self ? " (tu)" : ""} · {a.role === "proprietario" ? "Proprietario" : "Titolare"}</span>
             {!a.self && (
               <button
                 className={btnDanger}
@@ -103,19 +105,18 @@ function Admins() {
         ))}
       </ul>
       <form onSubmit={submit} className="space-y-4">
-        <Field label="Aggiungi amministratore (email)" hint="L'account deve già esistere (creato in Cloud → Users con password temporanea): al primo accesso gli verrà chiesto di cambiarla.">
+        <Field label="Assegna ruolo (email)" hint="L'account deve già esistere (creato dal backend con password temporanea): al primo accesso dovrà cambiarla.">
           <input className={input} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
+        <Field label="Ruolo">
+          <select className={input} value={newRole} onChange={(e) => setNewRole(e.target.value as "titolare" | "admin")}>
+            <option value="titolare">Titolare (testi, pacchetti, galleria)</option>
+            <option value="admin">Proprietario (accesso completo)</option>
+          </select>
+        </Field>
         {view}
-        <button className={`${btn} w-full`} disabled={busy}>Aggiungi</button>
+        <button className={`${btn} w-full`} disabled={busy}>Assegna ruolo</button>
       </form>
-      {temp && (
-        <div className="space-y-1 rounded-md border border-border bg-background p-3 text-sm" role="status">
-          <p>Comunica a <b>{temp.email}</b> questa password temporanea (viene mostrata una sola volta):</p>
-          <p className="select-all break-all font-mono text-base">{temp.password}</p>
-          <p className="text-muted-foreground">Al primo accesso su /admin gli verrà chiesto di sceglierne una nuova.</p>
-        </div>
-      )}
     </Card>
   );
 }

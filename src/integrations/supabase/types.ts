@@ -140,6 +140,24 @@ export type Database = {
         }
         Relationships: []
       }
+      password_change_required: {
+        Row: {
+          created_at: string
+          fingerprint: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fingerprint: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fingerprint?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       site_content: {
         Row: {
           data: Json
@@ -181,7 +199,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_edit: { Args: { _uid: string }; Returns: boolean }
       grant_admin: { Args: { _email: string }; Returns: string }
+      grant_role: {
+        Args: { _email: string; _role: Database["public"]["Enums"]["app_role"] }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -189,6 +212,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_owner: { Args: { _uid: string }; Returns: boolean }
       is_published_file: { Args: { _name: string }; Returns: boolean }
       list_admins: {
         Args: never
@@ -197,14 +221,27 @@ export type Database = {
           id: string
         }[]
       }
+      list_staff: {
+        Args: never
+        Returns: {
+          email: string
+          id: string
+          role: string
+        }[]
+      }
+      log_event: { Args: { _action: string }; Returns: undefined }
+      my_access: { Args: never; Returns: Json }
+      password_change_pending: { Args: { _uid: string }; Returns: boolean }
       reorder_items: {
         Args: { _ids: string[]; _table: string }
         Returns: undefined
       }
+      require_password_change: { Args: { _email: string }; Returns: boolean }
       revoke_admin: { Args: { _user_id: string }; Returns: boolean }
+      revoke_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin"
+      app_role: "admin" | "titolare"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -332,7 +369,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin"],
+      app_role: ["admin", "titolare"],
     },
   },
 } as const

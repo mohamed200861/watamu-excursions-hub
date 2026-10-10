@@ -73,7 +73,7 @@ function withHeaders(response: Response, url: URL): Response {
     if (r.ok) h.set("Cache-Control", "public, max-age=31536000, immutable");
   }
   // Only the final domain is indexable; previews and other hosts get noindex. Admin pages never.
-  if (url.host !== SITE_HOST || url.pathname.startsWith("/admin") || url.pathname.startsWith("/reset-password")) h.set("X-Robots-Tag", "noindex, nofollow");
+  if (url.host !== SITE_HOST || url.pathname.startsWith("/admin")) h.set("X-Robots-Tag", "noindex, nofollow");
   return r;
 }
 
