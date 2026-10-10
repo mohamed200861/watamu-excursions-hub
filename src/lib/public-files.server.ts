@@ -18,7 +18,7 @@ export async function sitemapXml(origin: string) {
     if (!legalOk && ["privacy", "cookie", "termini"].includes(s)) return; // noindex pages stay out
     entries.push({
       it: `/it/${s}`, en: `/en/${sections.en.list[i]}`,
-      images: s === "galleria" ? c.photos.map((p) => ({ loc: `${origin}/api/public/img/${p.path}`, title: p.alt || p.caption })) : undefined,
+      images: s === "galleria" ? c.photos.map((p) => ({ loc: p.src.startsWith("http") ? p.src : `${origin}${p.src}`, title: p.alt || p.caption })) : undefined,
     });
   });
   const updated = new Map(raw.packages.map((r) => [r.slug, (r as { updated_at?: string }).updated_at]));
