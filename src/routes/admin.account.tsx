@@ -66,7 +66,6 @@ function Admins() {
   const q = useQuery({ queryKey: ["admin", "admins"], queryFn: () => list() });
   const [email, setEmail] = useState("");
   const [newRole, setNewRole] = useState<"titolare" | "admin">("titolare");
-  const [temp, setTemp] = useState<{ email: string; password: string } | null>(null);
   const { run, busy, view } = useStatus();
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin", "admins"] });
 
@@ -74,8 +73,7 @@ function Admins() {
     e.preventDefault();
     const target = email.trim();
     run(async () => {
-      const r = await add({ data: { email: target, role: newRole } });
-      setTemp(r.tempPassword ? { email: target, password: r.tempPassword } : null);
+      await add({ data: { email: target, role: newRole } });
       setEmail("");
       refresh();
     }, "Ruolo assegnato");
@@ -119,13 +117,6 @@ function Admins() {
         {view}
         <button className={`${btn} w-full`} disabled={busy}>Assegna ruolo</button>
       </form>
-      {temp && (
-        <div className="space-y-1 rounded-md border border-border bg-background p-3 text-sm" role="status">
-          <p>Comunica a <b>{temp.email}</b> questa password temporanea (viene mostrata una sola volta):</p>
-          <p className="select-all break-all font-mono text-base">{temp.password}</p>
-          <p className="text-muted-foreground">Al primo accesso su /admin gli verrà chiesto di sceglierne una nuova.</p>
-        </div>
-      )}
     </Card>
   );
 }

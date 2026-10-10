@@ -239,7 +239,7 @@ export const addAdmin = createServerFn({ method: "POST" })
     fail(error, "Impossibile assegnare il ruolo");
     if (!id) throw new Error("Nessun account con questa email. Crealo prima in Cloud → Users (con password temporanea), poi riprova.");
     await log(context, "role.grant", { role: data.role });
-    return { tempPassword: null as string | null };
+    return { ok: true };
   });
 
 export const removeAdmin = createServerFn({ method: "POST" })
