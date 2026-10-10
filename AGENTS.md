@@ -12,7 +12,10 @@
 ## Project architecture
 - Italian public content lives in the database (site_content, packages, gallery_photos) and is read server-side via getSiteContent with a short timeout; English copy stays in src/lib/content-en.json keyed by slug, because only Italian is editable from /admin.
 - Public pages SSR live content and fall back to the worker's last good read, then to src/lib/content-snapshot.json (refreshed on every build), so a slow or paused backend never breaks public pages.
-- Admin writes go only through server functions that check the admin role and validate with zod, and log to audit_log; the auth client loads only on /admin and /reset-password to keep the public bundle small.
+- Admin writes go only through server functions that validate with zod and log to audit_log; the auth client loads only on /admin to keep the public bundle small.
+- Two staff roles in user_roles: 'admin' (= proprietario, developer) and 'titolare' (client). RLS uses can_edit()/is_owner(), which also return false while a first-login password change is pending (password_change_required stores only a hash fingerprint, set by an auth.users insert trigger or require_password_change() run from backend SQL), so permissions and the forced change are enforced by the database, not the UI.
+- No public password recovery: the developer resets passwords from the backend and then runs require_password_change(email); this avoids reset-link abuse and needs no service-role key.
+- The owner guide lives once in docs/GUIDA-TITOLARE.md and /admin/guida renders that same file, so the two versions cannot drift.
 - Gallery files sit in a private bucket; storage RLS lets the public key read only files referenced by gallery_photos or visible package covers, and /api/public/img/* proxies them with the public key only, so self-hosting (e.g. Cloudflare) needs no service-role secret.
 - Static brand files (logo, OG image) live in public/ rather than platform asset pointers, so external deploys from Git serve them.
 - The public address lives only in src/lib/site.ts (SITE_URL, overridable via VITE_SITE_URL) and feeds canonical, hreflang, OG, JSON-LD, sitemap/robots/llms and reset links; src/server.ts redirects www to it and adds X-Robots-Tag noindex on any other host, so previews never get indexed.

@@ -6,7 +6,7 @@ import { renderErrorPage } from "./lib/error-page";
 // so public pages never ship it (keeps the public bundle small).
 const attachAdminAuth = createMiddleware({ type: "function" }).client(async ({ next }) => {
   const path = typeof window === "undefined" ? "" : window.location.pathname;
-  if (!path.startsWith("/admin") && !path.startsWith("/reset-password")) return next();
+  if (!path.startsWith("/admin")) return next();
   const { supabase } = await import("@/integrations/supabase/client");
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
