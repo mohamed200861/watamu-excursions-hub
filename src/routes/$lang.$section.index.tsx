@@ -3,21 +3,31 @@ import { LegalPage } from "@/components/LegalPage";
 import { IndexPage, SimplePage } from "@/components/Site";
 import { loadContent } from "@/lib/content-client";
 import { legalComplete } from "@/lib/legal";
-import { getLocale, headFor, pageSeo } from "@/lib/seo";
+import { abs, agencySchema, breadcrumbSchema, getLocale, headFor, kindFor, pageSeo } from "@/lib/seo";
 const valid = ["safari", "safaris", "escursioni", "excursions", "parchi", "parks", "chi-siamo", "about", "galleria", "gallery", "contatti", "contact", "privacy", "cookie", "termini", "terms"];
 const legal = ["privacy", "cookie", "termini", "terms"];
 export const Route = createFileRoute("/$lang/$section/")({
   beforeLoad: ({ params }) => { if (!valid.includes(params.section)) throw notFound(); },
   loader: async ({ params }) => {
-    if (!legal.includes(params.section)) return { incomplete: false };
     const c = await loadContent(getLocale(params.lang));
-    return { incomplete: !legalComplete(c.owner) };
+    const kind = kindFor(params.section);
+    return {
+      incomplete: legal.includes(params.section) ? !legalComplete(c.owner) : false,
+      whatsapp: c.whatsapp, tripadvisor: c.tripadvisor, email: c.email,
+      items: kind ? c[kind].map((p) => ({ slug: p.slug, title: p.title })) : [],
+    };
   },
   staleTime: 60_000,
   head: ({ params, loaderData }) => {
     const l = getLocale(params.lang);
     const [t, d] = pageSeo[`${l}:${params.section}`] ?? ["ECO TOURS AND SAFARI'S", "Safari ed escursioni in Kenya da Watamu."];
-    return headFor(l, t, d, `/${l}/${params.section}`, undefined, "/eco-tours-og.webp", loaderData?.incomplete ?? legal.includes(params.section));
+    const path = `/${l}/${params.section}`;
+    const graph: object[] = [breadcrumbSchema(l, params.section)];
+    if (loaderData) {
+      graph.push(agencySchema(loaderData.whatsapp, loaderData.tripadvisor, loaderData.email));
+      if (loaderData.items.length) graph.push({ "@type": "ItemList", itemListElement: loaderData.items.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.title, url: abs(`${path}/${p.slug}`) })) });
+    }
+    return headFor(l, t, d, path, { "@context": "https://schema.org", "@graph": graph }, "/eco-tours-og.webp", loaderData?.incomplete ?? legal.includes(params.section));
   },
   component: Page,
 });

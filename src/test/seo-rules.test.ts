@@ -16,3 +16,10 @@ describe('seo rules', () => {
     for (const k of ['privacy','cookie','terms'] as const) for (const l of ['it','en'] as const) expect(JSON.stringify(legalSections(k, l, {}))).not.toContain('DA COMPLETARE');
   });
 });
+import { packageSchema } from '@/lib/seo';
+describe('package JSON-LD', () => {
+  const p = { title: 'T', description: 'D', itinerary: ['Giorno 1'], included: ['Jeep'] };
+  it('has no offers without a real price', () => expect(JSON.stringify(packageSchema('safari', { ...p, price: null }, '/it/safari/t'))).not.toContain('Offer'));
+  it('has no offers for "Chiedi su WhatsApp"', () => expect(JSON.stringify(packageSchema('safari', { ...p, price: 'Chiedi su WhatsApp' }, '/it/safari/t'))).not.toContain('Offer'));
+  it('never contains ratings or reviews', () => expect(JSON.stringify(packageSchema('safari', { ...p, price: '€ 300' }, '/x'))).not.toMatch(/aggregateRating|"Review"/));
+});
