@@ -1,5 +1,5 @@
 import { passwordTooShort } from "@/lib/password";
-import { SITE_URL } from "@/lib/site";
+import { RoleContext, type StaffRole } from "@/lib/admin-role";
 import { Link, Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/admin")({
 
 function AdminLayout() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [access, setAccess] = useState<{ role: StaffRole | null; pending: boolean } | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -38,28 +38,36 @@ function AdminLayout() {
     return () => data.subscription.unsubscribe();
   }, []);
 
+  const userId = session?.user.id;
+  const [tick, setTick] = useState(0);
   useEffect(() => {
-    if (!session) return setIsAdmin(null);
-    supabase
-      .rpc("has_role", { _user_id: session.user.id, _role: "admin" })
-      .then(({ data }) => setIsAdmin(!!data), () => setIsAdmin(false));
-  }, [session]);
+    if (!userId) return setAccess(null);
+    supabase.rpc("my_access").then(
+      ({ data }) => { const a = (data ?? {}) as { role?: StaffRole | null; pending?: boolean }; setAccess({ role: a.role ?? null, pending: !!a.pending }); },
+      () => setAccess({ role: null, pending: false }),
+    );
+  }, [userId, tick]);
 
   if (session === undefined) return <Center>Caricamento…</Center>;
   if (!session) return <Login />;
-  if (isAdmin === null) return <Center>Verifica account…</Center>;
-  if (!isAdmin) return <NotAdmin onClaimed={() => setIsAdmin(true)} />;
-  if (session.user.user_metadata?.["must_change_password"]) return <ForceChange />;
-  return <Shell email={session.user.email ?? ""} />;
+  if (access === null) return <Center>Verifica account…</Center>;
+  if (!access.role) return <NotAdmin />;
+  // The database also blocks every write until the password is changed, so this screen cannot be skipped.
+  if (access.pending || session.user.user_metadata?.["must_change_password"]) return <ForceChange onDone={() => { supabase.auth.refreshSession(); setTick((t) => t + 1); }} />;
+  return (
+    <RoleContext.Provider value={access.role}>
+      <Shell email={session.user.email ?? ""} role={access.role} />
+    </RoleContext.Provider>
+  );
 }
 
-function ForceChange() {
+function ForceChange({ onDone }: { onDone: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
         <Card title="Scegli la tua password">
           <p className="text-sm text-muted-foreground">Stai usando una password temporanea. Per continuare scegline una nuova e personale.</p>
-          <PasswordForm onDone={() => supabase.auth.refreshSession()} />
+          <PasswordForm onDone={onDone} />
           <button className={`${btnGhost} w-full`} onClick={() => supabase.auth.signOut()}>Esci</button>
         </Card>
       </div>
@@ -71,25 +79,28 @@ function Center({ children }: { children: React.ReactNode }) {
   return <div className="flex min-h-screen items-center justify-center bg-background p-6 text-muted-foreground">{children}</div>;
 }
 
-function Shell({ email }: { email: string }) {
+function Shell({ email, role }: { email: string; role: StaffRole }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
+    await supabase.rpc("log_event", { _action: "logout" }).then(() => undefined, () => undefined);
     await supabase.auth.signOut();
     navigate({ to: "/admin", replace: true });
   }
-  const links = [
+  const all = [
     { to: "/admin", label: "Testi" },
     { to: "/admin/pacchetti", label: "Pacchetti" },
     { to: "/admin/galleria", label: "Galleria" },
-    { to: "/admin/impostazioni", label: "WhatsApp e backup" },
+    { to: "/admin/guida", label: "Guida" },
+    { to: "/admin/impostazioni", label: "WhatsApp e backup", owner: true },
     { to: "/admin/account", label: "Account" },
   ] as const;
+  const links = all.filter((l) => !("owner" in l) || role === "proprietario");
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-10 border-b border-border bg-card">
+      <header className="no-print sticky top-0 z-10 border-b border-border bg-card">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-3">
           <b className="font-display text-lg">Gestione sito</b>
           <div className="flex items-center gap-2">
@@ -112,60 +123,62 @@ function Shell({ email }: { email: string }) {
         </nav>
       </header>
       <main className="mx-auto max-w-3xl space-y-4 px-4 py-6">
-        <p className="text-xs text-muted-foreground">Connesso come {email}</p>
+        <p className="text-xs text-muted-foreground no-print">Connesso come {email} · {role === "proprietario" ? "Proprietario" : "Titolare"}</p>
         <Outlet />
       </main>
     </div>
   );
 }
 
+const MAX_TRIES = 5;
+const LOCK_MS = 60_000;
+
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [forgot, setForgot] = useState(false);
+  const [fails, setFails] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState(0);
   const { run, busy, view } = useStatus();
 
   function submit(e: FormEvent) {
     e.preventDefault();
-    if (forgot) {
-      run(async () => {
-        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${SITE_URL}/reset-password` });
-        if (error) throw new Error("Invio non riuscito. Riprova tra poco.");
-      }, "Se l'indirizzo è corretto, riceverai un'email con il link per scegliere una nuova password.");
-    } else {
-      run(async () => {
-        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-        if (error) throw new Error("Email o password non corretti.");
-        // Older passwords shorter than the minimum must be replaced right away.
-        if (passwordTooShort(password)) await supabase.auth.updateUser({ data: { must_change_password: true } });
-      }, "Accesso eseguito");
-    }
+    run(async () => {
+      if (Date.now() < lockedUntil) throw new Error("Troppi tentativi. Aspetta un minuto e riprova.");
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) {
+        const n = fails + 1;
+        setFails(n);
+        if (n >= MAX_TRIES) { setLockedUntil(Date.now() + LOCK_MS); setFails(0); }
+        throw new Error("Email o password non corrette.");
+      }
+      setFails(0);
+      setPassword("");
+      await supabase.rpc("log_event", { _action: "login" }).then(() => undefined, () => undefined);
+      // Older passwords shorter than the minimum must be replaced right away.
+      if (passwordTooShort(password)) await supabase.auth.updateUser({ data: { must_change_password: true } });
+    }, "Accesso eseguito");
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <form onSubmit={submit} className="w-full max-w-sm">
-        <Card title={forgot ? "Recupera password" : "Accesso gestione sito"}>
+        <Card title="Accesso gestione sito">
           <Field label="Email">
             <input className={input} type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </Field>
-          {!forgot && (
-            <Field label="Password">
-              <input className={input} type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-            </Field>
-          )}
+          <Field label="Password">
+            <input className={input} type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+          </Field>
           {view}
-          <button className={`${btn} w-full`} disabled={busy}>{forgot ? "Invia link" : "Entra"}</button>
-          <button type="button" className="w-full text-sm underline" onClick={() => setForgot(!forgot)}>
-            {forgot ? "Torna all'accesso" : "Password dimenticata?"}
-          </button>
+          <button className={`${btn} w-full`} disabled={busy}>Entra</button>
+          <p className="text-sm text-muted-foreground">Hai dimenticato la password? Scrivi a [CONTATTO SVILUPPATORE DA COMPLETARE].</p>
         </Card>
       </form>
     </div>
   );
 }
 
-function NotAdmin(_: { onClaimed: () => void }) {
+function NotAdmin() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
