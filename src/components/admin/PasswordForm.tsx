@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Field, btn, input, useStatus } from "@/components/admin/ui";
-import { MIN_PASSWORD, passwordTooShort } from "@/lib/password";
+import { MIN_PASSWORD, passwordProblem } from "@/lib/password";
 
-/** Change password while signed in: requires the current password. */
+/** Change password while signed in: requires the current password. Passwords are never logged. */
 export function PasswordForm({ onDone }: { onDone?: () => void }) {
   const [current, setCurrent] = useState("");
   const [password, setPassword] = useState("");
@@ -13,16 +13,18 @@ export function PasswordForm({ onDone }: { onDone?: () => void }) {
   function submit(e: FormEvent) {
     e.preventDefault();
     run(async () => {
-      if (passwordTooShort(password)) throw new Error(`La nuova password deve avere almeno ${MIN_PASSWORD} caratteri.`);
-      if (password !== confirm) throw new Error("Le due password non coincidono.");
-      if (password === current) throw new Error("La nuova password deve essere diversa da quella attuale.");
       const { data: u } = await supabase.auth.getUser();
       const email = u.user?.email;
       if (!email) throw new Error("Sessione scaduta: accedi di nuovo.");
+      const problem = passwordProblem(password, email);
+      if (problem) throw new Error(problem);
+      if (password !== confirm) throw new Error("Le due password non coincidono.");
+      if (password === current) throw new Error("La nuova password deve essere diversa da quella attuale.");
       const check = await supabase.auth.signInWithPassword({ email, password: current });
       if (check.error) throw new Error("La password attuale non è corretta.");
       const { error } = await supabase.auth.updateUser({ password, current_password: current, data: { must_change_password: false } });
       if (error) throw new Error("Impossibile cambiare la password: scegline una più sicura (non usare password comuni).");
+      await supabase.rpc("log_event", { _action: "password.change" });
       setCurrent("");
       setPassword("");
       setConfirm("");
@@ -35,7 +37,7 @@ export function PasswordForm({ onDone }: { onDone?: () => void }) {
       <Field label="Password attuale">
         <input className={input} type="password" autoComplete="current-password" required value={current} onChange={(e) => setCurrent(e.target.value)} />
       </Field>
-      <Field label="Nuova password" hint={`Almeno ${MIN_PASSWORD} caratteri`}>
+      <Field label="Nuova password" hint={`Almeno ${MIN_PASSWORD} caratteri. Meglio tre o quattro parole a caso, facili da ricordare per te.`}>
         <input className={input} type="password" autoComplete="new-password" required minLength={MIN_PASSWORD} value={password} onChange={(e) => setPassword(e.target.value)} />
       </Field>
       <Field label="Ripeti la nuova password">
