@@ -204,7 +204,7 @@ export type Database = {
       revoke_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin"
+      app_role: "admin" | "titolare"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -332,7 +332,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin"],
+      app_role: ["admin", "titolare"],
     },
   },
 } as const
