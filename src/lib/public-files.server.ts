@@ -47,6 +47,8 @@ export async function llmsTxt(origin: string) {
     "- Instagram: https://instagram.com/africano_di_africa_",
     ...(c.tripadvisor ? [`- Tripadvisor (profilo "Africano Di Africa Kenya Safari Tours", nome alternativo di ECO TOURS AND SAFARI'S): ${c.tripadvisor}`] : []),
     ...(c.email ? [`- Email: ${c.email}`] : []),
+    `- Versione completa: ${origin}/llms-full.txt`,
+    "- Lingue: italiano, inglese",
     `- Sito in italiano: ${origin}/it — in inglese: ${origin}/en`,
     "",
     "## Chi siamo",
