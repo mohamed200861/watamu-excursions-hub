@@ -56,6 +56,6 @@ export async function llmsTxt(origin: string) {
 }
 
 export function robotsTxt(origin: string) {
-  const bots = ["Googlebot", "Google-Extended", "GPTBot", "ClaudeBot", "PerplexityBot", "Bingbot", "*"];
+  const bots = ["Googlebot", "Bingbot", "Google-Extended", "GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "PerplexityBot", "*"];
   return bots.map((b) => `User-agent: ${b}\nAllow: /\nDisallow: /admin\nDisallow: /reset-password\n`).join("\n") + `\nSitemap: ${origin}/sitemap.xml\n`;
 }

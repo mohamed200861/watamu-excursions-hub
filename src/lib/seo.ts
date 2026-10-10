@@ -1,4 +1,4 @@
-import { ALTERNATE_NAME, DEFAULT_TRIPADVISOR } from "@/lib/content-types";
+import { ALTERNATE_NAME, DEFAULT_EMAIL, DEFAULT_TRIPADVISOR } from "@/lib/content-types";
 import type { Kind, Locale, SiteContent } from "@/lib/content-types";
 import { SITE_URL, clamp } from "@/lib/site";
 const absolute = (path: string) => (path.startsWith("https://") ? path : `${SITE_URL}${path}`);
@@ -67,8 +67,10 @@ export function headFor(lang: Locale, title: string, description: string, path: 
       { property: "og:description", content: d },
       { property: "og:type", content: "website" },
       { property: "og:url", content: absolute(path) },
+      { property: "og:site_name", content: "ECO TOURS AND SAFARI'S" },
       { property: "og:locale", content: lang === "it" ? "it_IT" : "en_GB" },
-      ...(image ? [{ property: "og:image", content: absolute(image) }, { name: "twitter:image", content: absolute(image) }] : []),
+      { property: "og:locale:alternate", content: lang === "it" ? "en_GB" : "it_IT" },
+      ...(image ? [{ property: "og:image", content: absolute(image) }, { property: "og:image:width", content: "1200" }, { property: "og:image:height", content: "630" }, { property: "og:image:type", content: "image/webp" }, { name: "twitter:image", content: absolute(image) }] : []),
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: t },
       { name: "twitter:description", content: d },
@@ -89,7 +91,7 @@ export function kindFor(section: string): Kind | null {
   return null;
 }
 export const abs = absolute;
-export function agencySchema(whatsapp: string, tripadvisor: string = DEFAULT_TRIPADVISOR) {
+export function agencySchema(whatsapp: string, tripadvisor: string = DEFAULT_TRIPADVISOR, email: string = DEFAULT_EMAIL) {
   return {
     "@type": ["TravelAgency", "LocalBusiness"],
     "@id": `${SITE_URL}/#organization`,
@@ -100,11 +102,40 @@ export function agencySchema(whatsapp: string, tripadvisor: string = DEFAULT_TRI
     image: `${SITE_URL}/eco-tours-og.webp`,
     founder: { "@type": "Person", name: "Africano di Africa" },
     address: { "@type": "PostalAddress", addressLocality: "Watamu", addressRegion: "Kilifi", addressCountry: "KE" },
-    contactPoint: { "@type": "ContactPoint", telephone: `+${whatsapp}`, contactType: "reservations", availableLanguage: ["Italian", "English"] },
+    contactPoint: { "@type": "ContactPoint", telephone: `+${whatsapp}`, ...(email ? { email } : {}), contactType: "reservations", availableLanguage: ["Italian", "English"] },
     knowsLanguage: ["it", "en"],
-    areaServed: ["Watamu", "Malindi", "Kenya"],
+    areaServed: [{ "@type": "Place", name: "Watamu" }, { "@type": "Place", name: "Malindi" }, { "@type": "Country", name: "Kenya" }],
     telephone: `+${whatsapp}`,
+    ...(email ? { email } : {}),
     sameAs: ["https://instagram.com/africano_di_africa_", `https://wa.me/${whatsapp}`, ...(tripadvisor ? [tripadvisor] : [])],
+  };
+}
+export const websiteSchema = () => ({ "@type": "WebSite", "@id": `${SITE_URL}/#website`, url: SITE_URL, name: "ECO TOURS AND SAFARI'S", inLanguage: ["it", "en"], publisher: { "@id": `${SITE_URL}/#organization` } });
+const sectionNames: Record<string, string> = { safari: "Safari", safaris: "Safaris", escursioni: "Escursioni", excursions: "Excursions", parchi: "Parchi", parks: "Parks", "chi-siamo": "Chi siamo", about: "About", galleria: "Galleria", gallery: "Gallery", contatti: "Contatti", contact: "Contact", privacy: "Privacy", cookie: "Cookie", termini: "Termini", terms: "Terms" };
+export function breadcrumbSchema(lang: Locale, section: string, leaf?: { name: string; path: string }) {
+  const items = [
+    { name: "Home", item: absolute(`/${lang}`) },
+    { name: sectionNames[section] ?? section, item: absolute(`/${lang}/${section}`) },
+    ...(leaf ? [{ name: leaf.name, item: absolute(leaf.path) }] : []),
+  ];
+  return { "@type": "BreadcrumbList", itemListElement: items.map((x, i) => ({ "@type": "ListItem", position: i + 1, ...x })) };
+}
+export function faqSchema(faq: { q: string; a: string }[]) {
+  return { "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
+}
+/** Package as TouristTrip (safari/excursion) or TouristAttraction (park). Offers only when a real price exists. */
+export function packageSchema(kind: Kind, p: { title: string; description: string; itinerary: string[]; included: string[]; price?: string | null; parks?: string[] }, path: string, img?: string) {
+  const base = { name: p.title, description: p.description, url: absolute(path), ...(img ? { image: img } : {}) };
+  if (kind === "parks") return { "@type": "TouristAttraction", ...base, ...(p.parks?.length ? {} : {}), isAccessibleForFree: false };
+  const priceNum = p.price ? Number(String(p.price).replace(/[^0-9.]/g, "")) : NaN;
+  return {
+    "@type": "TouristTrip",
+    ...base,
+    touristType: kind === "safari" ? "Safari" : "Excursion",
+    provider: { "@id": `${SITE_URL}/#organization` },
+    ...(p.itinerary.length ? { itinerary: { "@type": "ItemList", numberOfItems: p.itinerary.length, itemListElement: p.itinerary.map((d, i) => ({ "@type": "ListItem", position: i + 1, name: d })) } } : {}),
+    ...(p.included.length ? { additionalProperty: p.included.map((x) => ({ "@type": "PropertyValue", name: "included", value: x })) } : {}),
+    ...(p.price && priceNum > 0 && /€|eur|\$|usd/i.test(p.price) ? { offers: { "@type": "Offer", price: priceNum, priceCurrency: /\$|usd/i.test(p.price) ? "USD" : "EUR", url: absolute(path) } } : {}),
   };
 }
 export type { SiteContent };
