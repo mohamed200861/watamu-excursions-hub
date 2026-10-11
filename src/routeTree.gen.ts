@@ -21,6 +21,7 @@ import { Route as LangSectionRouteImport } from './routes/$lang.$section'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAccountRouteImport } from './routes/admin.account'
 import { Route as AdminGalleriaRouteImport } from './routes/admin.galleria'
+import { Route as AdminGuidaRouteImport } from './routes/admin.guida'
 import { Route as AdminImpostazioniRouteImport } from './routes/admin.impostazioni'
 import { Route as AdminPacchettiRouteImport } from './routes/admin.pacchetti'
 import { Route as LangSectionIndexRouteImport } from './routes/$lang.$section.index'
@@ -87,6 +88,11 @@ const AdminGalleriaRoute = AdminGalleriaRouteImport.update({
   path: '/galleria',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGuidaRoute = AdminGuidaRouteImport.update({
+  id: '/guida',
+  path: '/guida',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminImpostazioniRoute = AdminImpostazioniRouteImport.update({
   id: '/impostazioni',
   path: '/impostazioni',
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/$lang/$section': typeof LangSectionRouteWithChildren
   '/admin/account': typeof AdminAccountRoute
   '/admin/galleria': typeof AdminGalleriaRoute
+  '/admin/guida': typeof AdminGuidaRoute
   '/admin/impostazioni': typeof AdminImpostazioniRoute
   '/admin/pacchetti': typeof AdminPacchettiRoute
   '/$lang/': typeof LangIndexRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/account': typeof AdminAccountRoute
   '/admin/galleria': typeof AdminGalleriaRoute
+  '/admin/guida': typeof AdminGuidaRoute
   '/admin/impostazioni': typeof AdminImpostazioniRoute
   '/admin/pacchetti': typeof AdminPacchettiRoute
   '/$lang': typeof LangIndexRoute
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/$lang/$section': typeof LangSectionRouteWithChildren
   '/admin/account': typeof AdminAccountRoute
   '/admin/galleria': typeof AdminGalleriaRoute
+  '/admin/guida': typeof AdminGuidaRoute
   '/admin/impostazioni': typeof AdminImpostazioniRoute
   '/admin/pacchetti': typeof AdminPacchettiRoute
   '/$lang/': typeof LangIndexRoute
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/$lang/$section'
     | '/admin/account'
     | '/admin/galleria'
+    | '/admin/guida'
     | '/admin/impostazioni'
     | '/admin/pacchetti'
     | '/$lang/'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/account'
     | '/admin/galleria'
+    | '/admin/guida'
     | '/admin/impostazioni'
     | '/admin/pacchetti'
     | '/$lang'
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/$lang/$section'
     | '/admin/account'
     | '/admin/galleria'
+    | '/admin/guida'
     | '/admin/impostazioni'
     | '/admin/pacchetti'
     | '/$lang/'
@@ -322,6 +334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGalleriaRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/guida': {
+      id: '/admin/guida'
+      path: '/guida'
+      fullPath: '/admin/guida'
+      preLoaderRoute: typeof AdminGuidaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/impostazioni': {
       id: '/admin/impostazioni'
       path: '/impostazioni'
@@ -389,6 +408,7 @@ const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 interface AdminRouteChildren {
   AdminAccountRoute: typeof AdminAccountRoute
   AdminGalleriaRoute: typeof AdminGalleriaRoute
+  AdminGuidaRoute: typeof AdminGuidaRoute
   AdminImpostazioniRoute: typeof AdminImpostazioniRoute
   AdminPacchettiRoute: typeof AdminPacchettiRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -397,6 +417,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAccountRoute: AdminAccountRoute,
   AdminGalleriaRoute: AdminGalleriaRoute,
+  AdminGuidaRoute: AdminGuidaRoute,
   AdminImpostazioniRoute: AdminImpostazioniRoute,
   AdminPacchettiRoute: AdminPacchettiRoute,
   AdminIndexRoute: AdminIndexRoute,
