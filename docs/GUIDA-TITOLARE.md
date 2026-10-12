@@ -44,7 +44,7 @@ ECO TOURS AND SAFARI'S · https://ecotoursandsafaris.it
 **Se dimentichi la password**
 
 1. Non c'è un recupero automatico.
-2. Scrivi allo sviluppatore: [CONTATTO SVILUPPATORE DA COMPLETARE].
+2. Scrivi allo sviluppatore: WhatsApp +39 327 417 3826.
 3. Lo sviluppatore ti dà una password temporanea.
 4. Entra con quella: il sito ti chiede subito di sceglierne una nuova.
 
@@ -187,7 +187,7 @@ Detto con onestà: i risultati arrivano in settimane o mesi. Nessuno può garant
 | Il sito non si aggiorna | Aspetta un minuto e ricarica la pagina. Controlla di aver toccato "Salva". |
 | Pagina bianca | Ricarica la pagina. Chiudi e riapri il browser. Se resta bianca, scrivi allo sviluppatore. |
 
-Per ogni problema: [CONTATTO SVILUPPATORE DA COMPLETARE].
+Per ogni problema: WhatsApp +39 327 417 3826.
 
 ## 11. Piccolo glossario
 
@@ -199,7 +199,7 @@ Per ogni problema: [CONTATTO SVILUPPATORE DA COMPLETARE].
 ## English version (short)
 
 1. **The site**: https://ecotoursandsafaris.it, in Italian and English. Manage it at https://ecotoursandsafaris.it/admin. Changes appear in about one minute.
-2. **Sign in**: enter "Email" and "Password", tap "Entra". On first sign-in you must change your password. To change it later: "Account" → "Cambia password". Forgot it? There is no automatic reset: write to the developer ([CONTATTO SVILUPPATORE DA COMPLETARE]) for a temporary password. Use at least 12 characters, for example three or four random words.
+2. **Sign in**: enter "Email" and "Password", tap "Entra". On first sign-in you must change your password. To change it later: "Account" → "Cambia password". Forgot it? There is no automatic reset: write to the developer (WhatsApp +39 327 417 3826) for a temporary password. Use at least 12 characters, for example three or four random words.
 3. **Texts**: "Testi" → edit a field → tap the "Salva …" button of that box. English texts are fixed: ask the developer.
 4. **Packages**: "Pacchetti" → "Safari", "Escursioni" or "Parchi" → "Modifica" or "+ Nuovo" → "Salva". Untick "Visibile sul sito" to hide, "Elimina" to delete.
 5. **Photos**: "Galleria" → "Scegli una o più foto". Landscape, sharp, good light. Ask people for permission. Photos are optimised automatically. "Nascondi" hides, "Elimina" deletes.
