@@ -171,7 +171,7 @@ function Login() {
           </Field>
           {view}
           <button className={`${btn} w-full`} disabled={busy}>Entra</button>
-          <p className="text-sm text-muted-foreground">Hai dimenticato la password? Scrivi a [CONTATTO SVILUPPATORE DA COMPLETARE].</p>
+          <p className="text-sm text-muted-foreground">Hai dimenticato la password? Scrivi a WhatsApp +39 327 417 3826.</p>
         </Card>
       </form>
     </div>
