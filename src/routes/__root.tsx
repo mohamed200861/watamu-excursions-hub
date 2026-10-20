@@ -81,6 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "ECO TOURS AND SAFARI'S" },
       { name: "description", content: "Safari ed escursioni autentiche in Kenya." },
       { name: "author", content: "Africano di Africa" },
+      { name: "google-adsense-account", content: "ca-pub-6841143407078696" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
