@@ -237,7 +237,7 @@ export const addAdmin = createServerFn({ method: "POST" })
     await assertOwner(context);
     const { data: id, error } = await (context.supabase as any).rpc("grant_role", { _email: data.email, _role: data.role });
     fail(error, "Impossibile assegnare il ruolo");
-    if (!id) throw new Error("Nessun account con questa email. Crealo prima in Cloud → Users (con password temporanea), poi riprova.");
+    if (!id) throw new Error("Nessun account confermato con questa email. Crealo prima in Cloud → Users (con email confermata e password temporanea), poi riprova.");
     await log(context, "role.grant", { role: data.role });
     return { ok: true };
   });
