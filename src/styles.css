@@ -311,7 +311,7 @@ footer.site-footer { display: block; padding-bottom: 6rem; }
 .footer-brand h2 { margin: .8rem 0; }
 .site-footer p { opacity: 1; }
 .site-footer nav { display: flex; flex-direction: column; gap: .8rem; font-size: .8rem; line-height: 1.6; }
-.site-footer nav h3 { font-size: 1.4rem; margin: 0 0 .5rem; }
+.site-footer nav h2 { font-size: 1.4rem; margin: 0 0 .5rem; }
 .site-footer a:hover { text-decoration: underline; }
 .social-links { display: flex; gap: .75rem; margin: 1rem 0; }
 .social-links a { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--primary-foreground); border-radius: 50%; }
