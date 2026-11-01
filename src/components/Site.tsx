@@ -187,9 +187,9 @@ function priceLabel(lang: Locale, item: Pkg) {
   return item.price ? item.price : lang === "it" ? "Prezzo: chiedi su WhatsApp" : "Price: ask on WhatsApp";
 }
 function Listing({ title, intro, items, lang, kind }: { title: string; intro: string; items: Pkg[]; lang: Locale; kind: Kind }) {
-  if (!items.length) return null;
   const base = paths[lang][kind];
   const c = useContent();
+  if (!items.length) return null;
   return (
     <section className="listing band">
       <div className="section-head">
