@@ -78,8 +78,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ECO TOURS AND SAFARI'S" },
-      { name: "description", content: "Safari ed escursioni autentiche in Kenya." },
+      { title: "Eco Tours and Safari's – Safari in Kenya da Watamu" },
+      { name: "description", content: "Safari nei parchi del Kenya ed escursioni a Watamu e Malindi con guida in italiano." },
       { name: "author", content: "Africano di Africa" },
       { name: "google-adsense-account", content: "ca-pub-6841143407078696" },
       { property: "og:type", content: "website" },
